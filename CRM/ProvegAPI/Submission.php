@@ -28,8 +28,9 @@ class CRM_ProvegAPI_Submission {
 
   /**
    * The ID of the group to use for newsletter registrations.
+   * TODO: Set to actual group ID.
    */
-  const NEWSLETTER_GROUP_ID = 0;
+  const NEWSLETTER_GROUP_ID = 1;
 
   /**
    * Retrieves the contact matching the given contact data or creates a new
