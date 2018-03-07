@@ -24,13 +24,24 @@ class CRM_ProvegAPI_Submission {
   /**
    * The financial type to create contributions with.
    */
-  const FINANCIAL_TYPE_ID = 'Donation';
+  const FINANCIAL_TYPE_ID = 1;
 
   /**
    * The ID of the group to use for newsletter registrations.
    * TODO: Set to actual group ID.
    */
   const NEWSLETTER_GROUP_ID = 1;
+
+  /**
+   * The name of the payment method used for PayPal contributions.
+   * TODO: Set to actual pament instrument ID.
+   */
+  const PAYMENT_INSTRUMENT_ID_PAYPAL = 'Cash';
+
+  /**
+   * The custom field ID for the membership sub type.
+   */
+  const MEMBERSHIP_SUB_TYPE_FIELD_ID = 4;
 
   /**
    * Retrieves the contact matching the given contact data or creates a new
