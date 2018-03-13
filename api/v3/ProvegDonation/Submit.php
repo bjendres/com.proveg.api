@@ -53,7 +53,7 @@ function civicrm_api3_proveg_donation_submit($params) {
       'postal_code' => $params['postal_code'],
       'country' => $params['country'],
     );
-    // Determine gender from the given greeting.
+    // Determine gender ID from the given gender.
     if (!empty($params['gender'])) {
       $gender_options = civicrm_api3('OptionValue', 'get', array('option_group_id' => 'gender'));
       $genders = array();
@@ -85,8 +85,8 @@ function civicrm_api3_proveg_donation_submit($params) {
       'financial_type_id' => CRM_ProvegAPI_Submission::FINANCIAL_TYPE_ID,
       'contact_id' => $contact_id,
       'total_amount' => $params['amount'] / 100,
-      'source' => 'ProvegAPI', // TODO: Anything else?
-      'receive_date' => date('YmdHis', REQUEST_TIME), // TODO: Maybe use an API parameter?
+      'source' => (!empty($params['contribution_source']) ? $params['contribution_source'] : CRM_ProvegAPI_Submission::CONTRIBUTION_SOURCE_DEFAULT),
+      'receive_date' => date('YmdHis', (!empty($params['receive_date']) ? $params['receive_date'] : REQUEST_TIME)),
     );
 
     // Handle recurring donations.
@@ -194,8 +194,6 @@ function civicrm_api3_proveg_donation_submit($params) {
       if (empty($params['membership_subtype_id'])) {
         throw new CiviCRM_API3_Exception('For memberships, the membership sub type must be provided.', 'invalid_format');
       }
-
-      // TODO: Update existing membership of same type and sub type?
 
       $membership_data = array(
         'membership_type_id' => $params['membership_type_id'],
@@ -392,5 +390,19 @@ function _civicrm_api3_proveg_donation_submit_spec(&$params) {
     'type'         => CRM_Utils_Type::T_INT,
     'api.required' => 0,
     'description'  => 'Whether to subscribe the contact to the configured newsletter group.',
+  );
+  $params['receive_date'] = array(
+    'name'         => 'receive_date',
+    'title'        => 'Receive date',
+    'type'         => CRM_Utils_Type::T_INT,
+    'api.required' => 0,
+    'description'  => 'A timestamp when the donation was issued.',
+  );
+  $params['contribution_source'] = array(
+    'name' => 'contribution_source',
+    'title' => 'Contribution source',
+    'type' => CRM_Utils_Type::T_STRING,
+    'api.required' => 0,
+    'description' => 'Text to identify the origin of the contribution.',
   );
 }

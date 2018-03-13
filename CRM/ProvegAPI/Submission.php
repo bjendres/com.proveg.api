@@ -44,6 +44,11 @@ class CRM_ProvegAPI_Submission {
   const MEMBERSHIP_SUB_TYPE_FIELD_ID = 4;
 
   /**
+   * The default value to use for the contribution source.
+   */
+  const CONTRIBUTION_SOURCE_DEFAULT = 'Proveg API';
+
+  /**
    * Retrieves the contact matching the given contact data or creates a new
    * contact.
    *
