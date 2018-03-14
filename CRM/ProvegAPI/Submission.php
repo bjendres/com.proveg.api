@@ -46,7 +46,7 @@ class CRM_ProvegAPI_Submission {
   /**
    * The default value to use for the contribution source.
    */
-  const CONTRIBUTION_SOURCE_DEFAULT = 'Proveg API';
+  const CONTRIBUTION_SOURCE_DEFAULT = 'ProVeg API';
 
   /**
    * Retrieves the contact matching the given contact data or creates a new
