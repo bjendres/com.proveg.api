@@ -55,6 +55,10 @@ function provegapi_civicrm_uninstall() {
  */
 function provegapi_civicrm_enable() {
   _provegapi_civix_civicrm_enable();
+
+  require_once 'CRM/ProvegAPI/CustomData.php';
+  $customData = new CRM_Betterplace_CustomData('de.systopia.betterplace');
+  $customData->syncOptionGroup(__DIR__ . '/resources/option_group_activity_type.json');
 }
 
 /**

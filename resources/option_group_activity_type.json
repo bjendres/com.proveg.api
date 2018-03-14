@@ -1,0 +1,15 @@
+{
+  "_lookup": ["name"],
+  "name": "activity_type",
+  "_values": [
+    {
+      "_lookup": ["name"],
+      "_translate": ["label"],
+      "label": "Failed ProVeg API contribution processing",
+      "name": "provegapi_failed_contribution_processing",
+      "filter": "0",
+      "is_reserved": "0",
+      "is_active": "1"
+    }
+  ]
+}

@@ -227,40 +227,38 @@ function civicrm_api3_proveg_donation_submit($params) {
 
     $extraParams = $exception->getExtraParams();
 
-    // TODO: Create an activity for failed contributions?
-//    // Rollback current base transaction in order to not rollback the creation
-//    // of the activity.
-//    if (($frame = \Civi\Core\Transaction\Manager::singleton()->getFrame()) !== NULL) {
-//      $frame->forceRollback();
-//    }
-//    try {
-//      // Create an activity of type "Failed contribution processing" and assign
-//      // it to the contact defined in configuration with fallback to the
-//      // currently logged in contact.
-//      $assignee_id = CRM_Core_BAO_Setting::getItem(
-//        'de.systopia.provegapi',
-//        'provegapi_contact_failed_contribution_processing'
-//      );
-//      $activity_data = array(
-//        'assignee_id'        => $assignee_id,
-//        'activity_type_id'   => CRM_Core_OptionGroup::getValue('activity_type', 'provegapi_failed_contribution_processing', 'name'),
-//        'subject'            => 'Failed ProVeg API contribution processing',
-//        'activity_date_time' => date('YmdHis'),
-//        'source_contact_id'  => CRM_Core_Session::singleton()->getLoggedInContactID(),
-//        'status_id'          => CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name'),
-//        'target_id'          => (isset($organisation_id) ? $organisation_id : $contact_id),
-//        'details'            => json_encode($params),
-//      );
-//      $activity = civicrm_api3('Activity', 'create', $activity_data);
-//      $extraParams['additional_notices']['activity']['result'] = $activity;
-//      if (!isset($assignee_id)) {
-//        $extraParams['additional_notices']['activity']['messages'][] = 'No contact ID is configured for assigning an activity of the type "Failed contribution processing". The activity has not been assigned to a contact.';
-//      }
-//    }
-//    catch (CiviCRM_API3_Exception $activity_exception) {
-//      $extraParams['additional_notices']['activity']['messages'][] = 'Failed creating an activity of the type "Failed contribution processing".';
-//      $extraParams['additional_notices']['activity']['result'] = civicrm_api3_create_error($activity_exception->getMessage(), $activity_exception->getExtraParams());
-//    }
+    // Rollback current base transaction in order to not rollback the creation
+    // of the activity.
+    if (($frame = \Civi\Core\Transaction\Manager::singleton()->getFrame()) !== NULL) {
+      $frame->forceRollback();
+    }
+    try {
+      // Create an activity of type "Failed contribution processing" and assign
+      // it to the contact defined in configuration.
+      $assignee_id = CRM_Core_BAO_Setting::getItem(
+        'com.proveg.api',
+        'provegapi_contact_failed_contribution_processing'
+      );
+      $activity_data = array(
+        'assignee_id'        => $assignee_id,
+        'activity_type_id'   => CRM_Core_OptionGroup::getValue('activity_type', 'provegapi_failed_contribution_processing', 'name'),
+        'subject'            => 'Failed ProVeg API contribution processing',
+        'activity_date_time' => date('YmdHis', REQUEST_TIME),
+        'source_contact_id'  => CRM_Core_Session::singleton()->getLoggedInContactID(),
+        'status_id'          => CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name'),
+        'target_id'          => $contact_id,
+        'details'            => json_encode($params),
+      );
+      $activity = civicrm_api3('Activity', 'create', $activity_data);
+      $extraParams['additional_notices']['activity']['result'] = $activity;
+      if (!isset($assignee_id)) {
+        $extraParams['additional_notices']['activity']['messages'][] = 'No contact ID is configured for assigning an activity of the type "Failed contribution processing". The activity has not been assigned to a contact.';
+      }
+    }
+    catch (CiviCRM_API3_Exception $activity_exception) {
+      $extraParams['additional_notices']['activity']['messages'][] = 'Failed creating an activity of the type "Failed contribution processing".';
+      $extraParams['additional_notices']['activity']['result'] = civicrm_api3_create_error($activity_exception->getMessage(), $activity_exception->getExtraParams());
+    }
 
     return civicrm_api3_create_error($exception->getMessage(), $extraParams);
   }
