@@ -32,6 +32,9 @@ The extension provides the following API calls:
 
 - Entity: `ProvegDonation`
 - Action: `Submit`
+- Dependencies:
+  - [Extended Contact Matcher](https://github.com/systopia/de.systopia.xcm)
+  - For SEPA contributions: [CiviSEPA](https://github.com/Project60/org.project60.sepa)
 
 | Parameter               | Type   | Cardinality | Required                              | Allowed values                               | Description                                                                                                                                                                                        |
 |-------------------------|--------|-------------|---------------------------------------|----------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -60,6 +63,8 @@ The extension provides the following API calls:
 
 - Entity: `ProvegNewsletterSubscription`
 - Action: `Submit`
+- Dependencies:
+  - [Extended Contact Matcher](https://github.com/systopia/de.systopia.xcm)
 
 | Parameter  | Type   | Cardinality | Required                           | Allowed values         | Description                                                                                                                                                                                              |
 |------------|--------|-------------|------------------------------------|------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
