@@ -132,6 +132,7 @@ function civicrm_api3_proveg_donation_submit($params) {
         $contribution_data['type'] = ($params['frequency'] ? 'RCUR' : 'OOFF');
         $contribution_data['iban'] = $params['iban'];
         $contribution_data['bic'] = $params['bic'];
+        $contribution_data['amount'] = $params['amount'];
         $sepa_mandate = civicrm_api3(
           'SepaMandate',
           'createfull',
