@@ -93,7 +93,7 @@ function civicrm_api3_proveg_donation_submit($params) {
     if ($params['frequency']) {
       $contribution_data['frequency_unit'] = 'month';
       $contribution_data['frequency_interval'] = 12 / $params['frequency'];
-      $contribution_data['amount'] = $contribution_data['total_amount'];
+      $contribution_data['amount'] = $contribution_data['total_amount'] / 100;
       unset($contribution_data['total_amount']);
     }
 
@@ -132,7 +132,7 @@ function civicrm_api3_proveg_donation_submit($params) {
         $contribution_data['type'] = ($params['frequency'] ? 'RCUR' : 'OOFF');
         $contribution_data['iban'] = $params['iban'];
         $contribution_data['bic'] = $params['bic'];
-        $contribution_data['amount'] = $params['amount'];
+        $contribution_data['amount'] = $params['amount'] / 100;
         $sepa_mandate = civicrm_api3(
           'SepaMandate',
           'createfull',
