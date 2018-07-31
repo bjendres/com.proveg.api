@@ -196,6 +196,7 @@ function civicrm_api3_proveg_donation_submit($params) {
         throw new CiviCRM_API3_Exception('For memberships, the membership sub type must be provided.', 'invalid_format');
       }
 
+      // TODO: Custom field name als const, CustomData::getCustomFieldKey() - kann NULL sein.
       $membership_data = array(
         'membership_type_id' => $params['membership_type_id'],
         'custom_' . CRM_ProvegAPI_Submission::MEMBERSHIP_SUB_TYPE_FIELD_ID => $params['membership_subtype_id'],
