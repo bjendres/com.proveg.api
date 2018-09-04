@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <extension key="com.proveg.api" type="module">
   <file>provegapi</file>
-  <name>proVEG API</name>
+  <name>ProVeg API</name>
   <description>Provides customized interfaces for applications to communicate with CiviCRM.</description>
   <license>AGPL-3.0</license>
   <maintainer>
@@ -21,6 +21,7 @@
     <ver>4.7</ver>
   </compatibility>
   <comments></comments>
+  <requires>de.systopia.xcm</requires>
   <civix>
     <namespace>CRM/ProvegAPI</namespace>
   </civix>
