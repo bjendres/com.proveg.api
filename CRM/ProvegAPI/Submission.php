@@ -49,6 +49,15 @@ class CRM_ProvegAPI_Submission {
   const CONTRIBUTION_SOURCE_DEFAULT = 'ProVeg API';
 
   /**
+   * Buffer days to still collect the money,
+   *  i.e. you cannot submit a membership to start the 1st of may on april 30th,
+   *  because the mandate would not be collected any more
+   */
+  const CONTRIBUTION_BUFFER_DAYS = 5;
+
+
+
+  /**
    * Retrieves the contact matching the given contact data or creates a new
    * contact.
    *
@@ -100,6 +109,21 @@ class CRM_ProvegAPI_Submission {
     }
 
     return $contact['id'];
+  }
+
+  /**
+   * Get the next possible start date,
+   * which is the next 1st of the month
+   * respecting the buffer days
+   */
+  public static function getStartDate() {
+    $buffer = self::CONTRIBUTION_BUFFER_DAYS;
+    $earliest = strtotime("now + {$buffer} days");
+    while (date('j', $earliest) > 1) {
+      // get to the next day
+      $earliest = strtotime("+1 day", $earliest);
+    }
+    return date('Y-m-d', $earliest);
   }
 
   /**

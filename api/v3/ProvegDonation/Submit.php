@@ -131,10 +131,11 @@ function civicrm_api3_proveg_donation_submit($params) {
         }
 
         // Create SEPA mandate and contribution.
-        $contribution_data['type'] = ($params['frequency'] ? 'RCUR' : 'OOFF');
-        $contribution_data['iban'] = $params['iban'];
-        $contribution_data['bic'] = $params['bic'];
-        $contribution_data['amount'] = $params['amount'] / 100;
+        $contribution_data['type']       = ($params['frequency'] ? 'RCUR' : 'OOFF');
+        $contribution_data['iban']       = $params['iban'];
+        $contribution_data['bic']        = $params['bic'];
+        $contribution_data['amount']     = $params['amount'] / 100;
+        $contribution_data['start_date'] = CRM_ProvegAPI_Submission::getStartDate();
         $contribution_data['check_permissions'] = 0;
         $sepa_mandate = civicrm_api3(
           'SepaMandate',
@@ -197,11 +198,6 @@ function civicrm_api3_proveg_donation_submit($params) {
 
     // If requested, create membership for the contact.
     if (!empty($params['membership_type_id'])) {
-      // Require membership sub type ID.
-      if (empty($params['membership_subtype_id'])) {
-        throw new CiviCRM_API3_Exception('For memberships, the membership sub type must be provided.', 'invalid_format');
-      }
-
       // TODO: Custom field name als const, CustomData::getCustomFieldKey() - kann NULL sein.
       $membership_data = array(
         'check_permissions'  => 0,
@@ -209,13 +205,27 @@ function civicrm_api3_proveg_donation_submit($params) {
 //        'custom_' . CRM_ProvegAPI_Submission::MEMBERSHIP_SUB_TYPE_FIELD_ID => $params['membership_subtype_id'],
         'contact_id'         => $contact_id,
       );
+
+      // add subtype if given
+      if (empty($params['membership_subtype_id'])) {
+        // TODO:
+      }
+
       // TODO: Add Foreign key to recurring contribution (if it's recurring)?
       // $membership_data['contribution_recur_id'] = $contribution['id'];
 
+      // add join/start/end date
+      $start_date = CRM_ProvegAPI_Submission::getStartDate();
+      $membership_data['start_date'] = $start_date;
+      $membership_data['end_date']   = date('Y-m-d', strtotime("{$start_date} +1 year -1 day"));
+      $membership_data['join_date']  = date('Y-m-d');
+
+      // create membership
       $membership = civicrm_api3('Membership', 'create', $membership_data);
 
-      // Include membership in extraReturnValues parameter.
-      $extra_return_values['Membership'] = $membership;
+      // DISABLED: Include membership in extraReturnValues parameter.
+      // I think this reveals a lot while being uneccessary
+      // $extra_return_values['Membership'] = $membership;
     }
 
     // If requested, perform a newsletter subscription for the contact.
