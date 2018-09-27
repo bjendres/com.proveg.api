@@ -45,17 +45,19 @@ function civicrm_api3_proveg_donation_submit($params) {
     // Get the ID of the contact matching the given contact data, or create a
     // new contact if none exists for the given contact data.
     $contact_data = array(
-      'first_name' => $params['first_name'],
-      'last_name' => $params['last_name'],
-      'email' => $params['email'],
+      'first_name'     => $params['first_name'],
+      'last_name'      => $params['last_name'],
+      'email'          => $params['email'],
       'street_address' => $params['street_address'],
-      'city' => $params['city'],
-      'postal_code' => $params['postal_code'],
-      'country' => $params['country'],
+      'city'           => $params['city'],
+      'postal_code'    => $params['postal_code'],
+      'country'        => $params['country'],
     );
     // Determine gender ID from the given gender.
     if (!empty($params['gender'])) {
-      $gender_options = civicrm_api3('OptionValue', 'get', array('option_group_id' => 'gender'));
+      $gender_options = civicrm_api3('OptionValue', 'get', array(
+          'check_permissions' => 0,
+          'option_group_id'   => 'gender'));
       $genders = array();
       foreach ($gender_options['values'] as $gender_option) {
         $genders[$gender_option['value']] = $gender_option['name'];
@@ -133,6 +135,7 @@ function civicrm_api3_proveg_donation_submit($params) {
         $contribution_data['iban'] = $params['iban'];
         $contribution_data['bic'] = $params['bic'];
         $contribution_data['amount'] = $params['amount'] / 100;
+        $contribution_data['check_permissions'] = 0;
         $sepa_mandate = civicrm_api3(
           'SepaMandate',
           'createfull',
@@ -153,10 +156,12 @@ function civicrm_api3_proveg_donation_submit($params) {
         if (!empty($sepa_mandate['values'][$sepa_mandate['id']]['entity_id'])) {
           if ($sepa_mandate['values'][$sepa_mandate['id']]['entity_table'] == 'civicrm_contribution') {
             $contribution = civicrm_api3('Contribution','get', array(
-              'id' => $sepa_mandate['values'][$sepa_mandate['id']]['entity_id']
+              'check_permissions' => 0,
+              'id'                => $sepa_mandate['values'][$sepa_mandate['id']]['entity_id']
             ));
           } else if ($sepa_mandate['values'][$sepa_mandate['id']]['entity_table'] == 'civicrm_contribution_recur') {
             $contribution = civicrm_api3('ContributionRecur','get', array(
+              'check_permissions' => 0,
               'id' => $sepa_mandate['values'][$sepa_mandate['id']]['entity_id']));
           }
           if (!isset($contribution)) {
@@ -173,6 +178,7 @@ function civicrm_api3_proveg_donation_submit($params) {
       case 'paypal':
         $contribution_data['payment_instrument_id'] = CRM_ProvegAPI_Submission::PAYMENT_INSTRUMENT_ID_PAYPAL;
         $contribution_data['contribution_status_id'] = 'Completed';
+        $contribution_data['check_permissions'] = 0;
         $contribution = civicrm_api3(
           'Contribution',
           'create',
@@ -198,9 +204,10 @@ function civicrm_api3_proveg_donation_submit($params) {
 
       // TODO: Custom field name als const, CustomData::getCustomFieldKey() - kann NULL sein.
       $membership_data = array(
+        'check_permissions'  => 0,
         'membership_type_id' => $params['membership_type_id'],
-        'custom_' . CRM_ProvegAPI_Submission::MEMBERSHIP_SUB_TYPE_FIELD_ID => $params['membership_subtype_id'],
-        'contact_id' => $contact_id,
+//        'custom_' . CRM_ProvegAPI_Submission::MEMBERSHIP_SUB_TYPE_FIELD_ID => $params['membership_subtype_id'],
+        'contact_id'         => $contact_id,
       );
       // TODO: Add Foreign key to recurring contribution (if it's recurring)?
       // $membership_data['contribution_recur_id'] = $contribution['id'];
@@ -214,8 +221,9 @@ function civicrm_api3_proveg_donation_submit($params) {
     // If requested, perform a newsletter subscription for the contact.
     if (!empty($params['newsletter'])) {
       $newsletter_subscription = civicrm_api3('ProvegNewsletterSubscription', 'submit', array(
-        'contact_id' => $contact_id,
-        'newsletter' => 1,
+          'check_permissions'  => 0,
+          'contact_id'         => $contact_id,
+          'newsletter'         => 1,
       ));
       $extra_return_values['ProvegNewsletterSubscription'] = $newsletter_subscription;
     }
@@ -242,6 +250,7 @@ function civicrm_api3_proveg_donation_submit($params) {
         'provegapi_contact_failed_contribution_processing'
       );
       $activity_data = array(
+        'check_permissions'  => 0,
         'assignee_id'        => $assignee_id,
         'activity_type_id'   => CRM_Core_OptionGroup::getValue('activity_type', 'provegapi_failed_contribution_processing', 'name'),
         'subject'            => 'Failed ProVeg API contribution processing',

@@ -78,7 +78,9 @@ class CRM_ProvegAPI_Submission {
       }
       else {
         // Look up the country depending on the given ISO code.
-        $country = civicrm_api3('Country', 'get', array('iso_code' => $contact_data['country']));
+        $country = civicrm_api3('Country', 'get', array(
+            'check_permissions' => 0,
+            'iso_code' => $contact_data['country']));
         if (!empty($country['id'])) {
           $contact_data['country_id'] = $country['id'];
           unset($contact_data['country']);
@@ -91,6 +93,7 @@ class CRM_ProvegAPI_Submission {
 
     // Pass to XCM.
     $contact_data['contact_type'] = $contact_type;
+    $contact_data['check_permissions'] = 0;
     $contact = civicrm_api3('Contact', 'getorcreate', $contact_data);
     if (empty($contact['id'])) {
       return NULL;
@@ -122,8 +125,9 @@ class CRM_ProvegAPI_Submission {
 
     // Check whether organisation has a WORK address.
     $existing_org_addresses = civicrm_api3('Address', 'get', array(
-      'contact_id'       => $organisation_id,
-      'location_type_id' => $location_type_id));
+      'check_permissions' => 0,
+      'contact_id'        => $organisation_id,
+      'location_type_id'  => $location_type_id));
     if ($existing_org_addresses['count'] <= 0) {
       // Organisation does not have a WORK address.
       return FALSE;
@@ -131,8 +135,9 @@ class CRM_ProvegAPI_Submission {
 
     // Check whether contact already has a WORK address.
     $existing_contact_addresses = civicrm_api3('Address', 'get', array(
-      'contact_id'       => $contact_id,
-      'location_type_id' => $location_type_id));
+        'check_permissions' => 0,
+        'contact_id'        => $contact_id,
+      'location_type_id'    => $location_type_id));
     if ($existing_contact_addresses['count'] > 0) {
       // Contact already has a WORK address.
       return FALSE;
@@ -140,8 +145,9 @@ class CRM_ProvegAPI_Submission {
 
     // Create a shared address.
     $address = reset($existing_org_addresses['values']);
-    $address['contact_id'] = $contact_id;
-    $address['master_id']  = $address['id'];
+    $address['contact_id']         = $contact_id;
+    $address['master_id']          = $address['id'];
+    $address['check_permissions']  = 0;
     unset($address['id']);
     civicrm_api3('Address', 'create', $address);
     return TRUE;

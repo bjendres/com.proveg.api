@@ -1,7 +1,38 @@
 <?php
+/*------------------------------------------------------------+
+| ProVeg API extension                                        |
+| Copyright (C) 2017 SYSTOPIA                                 |
+| Author: B. Endres (endres@systopia.de)                      |
+|         J. Schuppe (schuppe@systopia.de)                    |
++-------------------------------------------------------------+
+| This program is released as free software under the         |
+| Affero GPL license. You can redistribute it and/or          |
+| modify it under the terms of this license which you         |
+| can read by viewing the included agpl.txt or online         |
+| at www.gnu.org/licenses/agpl.html. Removal of this          |
+| copyright header is strictly prohibited without             |
+| written permission from the original author(s).             |
++-------------------------------------------------------------*/
 
 require_once 'provegapi.civix.php';
 use CRM_ProvegAPI_ExtensionUtil as E;
+
+/**
+ * Define custom (Drupal) permissions
+ */
+function provegapi_civicrm_permission(&$permissions) {
+  $permissions['access Donation API'] = 'API: access ProvegDonation API';
+}
+
+/**
+ * Set permissions for runner/engine API call
+ */
+function provegapi_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissions) {
+  // ProvegDonation
+  $permissions['proveg_donation']['submit']                = array('access Donation API');
+  $permissions['proveg_newsletter_subscription']['submit'] = array('access Donation API');
+}
+
 
 /**
  * Implements hook_civicrm_config().
