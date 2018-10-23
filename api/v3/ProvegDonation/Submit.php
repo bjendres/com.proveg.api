@@ -197,21 +197,12 @@ function civicrm_api3_proveg_donation_submit($params) {
         'check_permissions'  => 0,
         'membership_type_id' => $params['membership_type_id'],
         'contact_id'         => $contact_id,
+        'source'             => CRM_Utils_Array::value('contribution_source', $params, CRM_ProvegAPI_Submission::CONTRIBUTION_SOURCE_DEFAULT),
       );
 
       // add subtype if given
       if (!empty($params['membership_subtype_id'])) {
         $membership_data['membership_type.membership_subtype'] = $params['membership_subtype_id'];
-      }
-
-      // add mandate
-      if ($recurring_contribution_id) {
-        $membership_data['membership_info.membership_paid_through'] = $recurring_contribution_id;
-      }
-
-      // add annual amount
-      if ($annual_amount) {
-        $membership_data['membership_type.membership_annual'] = $annual_amount;
       }
 
       // add join/start/end date
@@ -222,8 +213,35 @@ function civicrm_api3_proveg_donation_submit($params) {
 
       // create membership
       CRM_ProvegAPI_CustomData::resolveCustomFields($membership_data);
-      // CRM_Core_Error::debug_log_message("Membership: " . json_encode($membership_data));
+      CRM_Core_Error::debug_log_message("Membership create: " . json_encode($membership_data));
       $membership = civicrm_api3('Membership', 'create', $membership_data);
+
+      // reload to get all data
+      $membership = civicrm_api3('Membership', 'getsingle', ['id' => $membership['id']]);
+
+      // NOW: add more stuff
+      $membership_update = [
+          'id'         => $membership['id'],
+          'contact_id' => $membership['contact_id']
+      ];
+
+      // add mandate
+      if ($recurring_contribution_id) {
+        $membership_update['membership_info.membership_paid_through'] = $recurring_contribution_id;
+      }
+
+      // add annual amount
+      if ($annual_amount) {
+        $membership_update['membership_type.membership_annual'] = $annual_amount;
+      }
+
+      // add number
+      CRM_ProvegAPI_CustomData::resolveCustomFields($membership_update);
+      CRM_Membership_NumberLogic::generateNewNumber($membership_update);
+
+      // and update
+      CRM_Core_Error::debug_log_message("Membership update: " . json_encode($membership_update));
+      civicrm_api3('Membership', 'create', $membership_update);
 
       // DISABLED: Include membership in extraReturnValues parameter.
       // I think this reveals a lot while being unnecessary
