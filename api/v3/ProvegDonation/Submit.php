@@ -100,6 +100,8 @@ function civicrm_api3_proveg_donation_submit($params) {
     }
 
     // Handle payment instruments.
+    $recurring_contribution_id = NULL;
+    $annual_amount = NULL;
     switch ($params['payment_instrument_id']) {
       // SEPA.
       case 'sepa':
@@ -129,6 +131,9 @@ function civicrm_api3_proveg_donation_submit($params) {
             'invalid_format'
           );
         }
+
+        // calculate values
+        $annual_amount = ((float) $params['amount']) / 100.00 * (float) $params['frequency'];
 
         // Create SEPA mandate and contribution.
         $contribution_data['type']       = ($params['frequency'] ? 'RCUR' : 'OOFF');
@@ -164,6 +169,7 @@ function civicrm_api3_proveg_donation_submit($params) {
             $contribution = civicrm_api3('ContributionRecur','get', array(
               'check_permissions' => 0,
               'id' => $sepa_mandate['values'][$sepa_mandate['id']]['entity_id']));
+            $recurring_contribution_id = $contribution['id'];
           }
           if (!isset($contribution)) {
             throw new CiviCRM_API3_Exception(
@@ -198,21 +204,26 @@ function civicrm_api3_proveg_donation_submit($params) {
 
     // If requested, create membership for the contact.
     if (!empty($params['membership_type_id'])) {
-      // TODO: Custom field name als const, CustomData::getCustomFieldKey() - kann NULL sein.
       $membership_data = array(
         'check_permissions'  => 0,
         'membership_type_id' => $params['membership_type_id'],
-//        'custom_' . CRM_ProvegAPI_Submission::MEMBERSHIP_SUB_TYPE_FIELD_ID => $params['membership_subtype_id'],
         'contact_id'         => $contact_id,
       );
 
       // add subtype if given
-      if (empty($params['membership_subtype_id'])) {
-        // TODO:
+      if (!empty($params['membership_subtype_id'])) {
+        $membership_data['membership_type.membership_subtype'] = $params['membership_subtype_id'];
       }
 
-      // TODO: Add Foreign key to recurring contribution (if it's recurring)?
-      // $membership_data['contribution_recur_id'] = $contribution['id'];
+      // add mandate
+      if ($recurring_contribution_id) {
+        $membership_data['membership_info.membership_paid_through'] = $recurring_contribution_id;
+      }
+
+      // add annual amount
+      if (!empty($params['membership_subtype_id'])) {
+        $membership_data['membership_type.membership_annual'] = $annual_amount;
+      }
 
       // add join/start/end date
       $start_date = CRM_ProvegAPI_Submission::getStartDate();
@@ -221,10 +232,11 @@ function civicrm_api3_proveg_donation_submit($params) {
       $membership_data['join_date']  = date('Y-m-d');
 
       // create membership
+      CRM_ProvegAPI_CustomData::resolveCustomFields($membership_data);
       $membership = civicrm_api3('Membership', 'create', $membership_data);
 
       // DISABLED: Include membership in extraReturnValues parameter.
-      // I think this reveals a lot while being uneccessary
+      // I think this reveals a lot while being unnecessary
       // $extra_return_values['Membership'] = $membership;
     }
 
