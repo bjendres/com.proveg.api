@@ -33,6 +33,8 @@ function civicrm_api3_proveg_donation_submit($params) {
   }
 
   $extra_return_values = array();
+  $recurring_contribution_id = NULL;
+  $annual_amount = NULL;
 
   try {
     if ($params['frequency'] && $params['payment_instrument_id'] != 'sepa') {
@@ -100,8 +102,6 @@ function civicrm_api3_proveg_donation_submit($params) {
     }
 
     // Handle payment instruments.
-    $recurring_contribution_id = NULL;
-    $annual_amount = NULL;
     switch ($params['payment_instrument_id']) {
       // SEPA.
       case 'sepa':
@@ -132,9 +132,6 @@ function civicrm_api3_proveg_donation_submit($params) {
           );
         }
 
-        // calculate values
-        $annual_amount = ((float) $params['amount']) / 100.00 * (float) $params['frequency'];
-
         // Create SEPA mandate and contribution.
         $contribution_data['type']       = ($params['frequency'] ? 'RCUR' : 'OOFF');
         $contribution_data['iban']       = $params['iban'];
@@ -147,29 +144,22 @@ function civicrm_api3_proveg_donation_submit($params) {
           'createfull',
           $contribution_data
         );
-        if (!empty($result['is_error'])) {
-          throw new CiviCRM_API3_Exception(
-            'Could not create a SEPA mandate and/or contribution.',
-            'invalid_format',
-            array(
-              'result' => $sepa_mandate,
-            )
-          );
-        }
-        $extra_return_values['SepaMandate'] = $sepa_mandate;
+        // $extra_return_values['SepaMandate'] = $sepa_mandate;
 
         // Load contribution.
-        if (!empty($sepa_mandate['values'][$sepa_mandate['id']]['entity_id'])) {
-          if ($sepa_mandate['values'][$sepa_mandate['id']]['entity_table'] == 'civicrm_contribution') {
-            $contribution = civicrm_api3('Contribution','get', array(
+        if (!empty($sepa_mandate['entity_id'])) {
+          if ($sepa_mandate['entity_table'] == 'civicrm_contribution') {
+            $contribution = civicrm_api3('Contribution','getsingle', array(
               'check_permissions' => 0,
-              'id'                => $sepa_mandate['values'][$sepa_mandate['id']]['entity_id']
+              'id'                => $sepa_mandate['entity_id']
             ));
-          } else if ($sepa_mandate['values'][$sepa_mandate['id']]['entity_table'] == 'civicrm_contribution_recur') {
-            $contribution = civicrm_api3('ContributionRecur','get', array(
+          } else if ($sepa_mandate['entity_table'] == 'civicrm_contribution_recur') {
+            $recurring_contribution_id = (int) $sepa_mandate['entity_id'];
+            $annual_amount = ((float) $params['amount']) / 100.00 * (float) $params['frequency'];
+
+            $contribution = civicrm_api3('ContributionRecur','getsingle', array(
               'check_permissions' => 0,
-              'id' => $sepa_mandate['values'][$sepa_mandate['id']]['entity_id']));
-            $recurring_contribution_id = $contribution['id'];
+              'id' => $sepa_mandate['entity_id']));
           }
           if (!isset($contribution)) {
             throw new CiviCRM_API3_Exception(
@@ -177,7 +167,6 @@ function civicrm_api3_proveg_donation_submit($params) {
               'invalid_format'
             );
           }
-          $contribution = $contribution['values'];
         }
         break;
 
@@ -221,7 +210,7 @@ function civicrm_api3_proveg_donation_submit($params) {
       }
 
       // add annual amount
-      if (!empty($params['membership_subtype_id'])) {
+      if ($annual_amount) {
         $membership_data['membership_type.membership_annual'] = $annual_amount;
       }
 
@@ -233,6 +222,7 @@ function civicrm_api3_proveg_donation_submit($params) {
 
       // create membership
       CRM_ProvegAPI_CustomData::resolveCustomFields($membership_data);
+      // CRM_Core_Error::debug_log_message("Membership: " . json_encode($membership_data));
       $membership = civicrm_api3('Membership', 'create', $membership_data);
 
       // DISABLED: Include membership in extraReturnValues parameter.
