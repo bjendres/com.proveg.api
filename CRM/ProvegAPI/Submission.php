@@ -30,18 +30,14 @@ class CRM_ProvegAPI_Submission {
    * The ID of the group to use for newsletter registrations.
    * TODO: Set to actual group ID.
    */
-  const NEWSLETTER_GROUP_ID = 1;
+  const NEWSLETTER_GROUP_ID = 108;
 
   /**
    * The name of the payment method used for PayPal contributions.
    * TODO: Set to actual pament instrument ID.
    */
-  const PAYMENT_INSTRUMENT_ID_PAYPAL = 'Cash';
+  const PAYMENT_INSTRUMENT_ID_PAYPAL = 12;
 
-  /**
-   * The custom field ID for the membership sub type.
-   */
-  const MEMBERSHIP_SUB_TYPE_FIELD_ID = 4;
 
   /**
    * The default value to use for the contribution source.
