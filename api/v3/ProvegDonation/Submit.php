@@ -86,11 +86,11 @@ function civicrm_api3_proveg_donation_submit($params) {
 
     // Prepare contribution data.
     $contribution_data = array(
-      'financial_type_id' => CRM_ProvegAPI_Submission::FINANCIAL_TYPE_ID,
-      'contact_id' => $contact_id,
-      'total_amount' => $params['amount'] / 100,
-      'source' => (!empty($params['contribution_source']) ? $params['contribution_source'] : CRM_ProvegAPI_Submission::CONTRIBUTION_SOURCE_DEFAULT),
-      'receive_date' => date('YmdHis', (!empty($params['receive_date']) ? $params['receive_date'] : REQUEST_TIME)),
+        'financial_type_id' => CRM_ProvegAPI_Submission::FINANCIAL_TYPE_ID,
+        'contact_id'        => $contact_id,
+        'total_amount'      => $params['amount'] / 100,
+        'source'            => (!empty($params['contribution_source']) ? $params['contribution_source'] : CRM_ProvegAPI_Submission::CONTRIBUTION_SOURCE_DEFAULT),
+        'receive_date'      => date('YmdHis', (!empty($params['receive_date']) ? $params['receive_date'] : REQUEST_TIME)),
     );
 
     // Handle recurring donations.
@@ -99,6 +99,7 @@ function civicrm_api3_proveg_donation_submit($params) {
       $contribution_data['frequency_interval'] = 12 / $params['frequency'];
       $contribution_data['amount'] = $contribution_data['total_amount'] / 100;
       unset($contribution_data['total_amount']);
+      $annual_amount = ((float) $params['amount']) * (float) $params['frequency'] / 100;
     }
 
     // Handle payment instruments.
@@ -144,6 +145,7 @@ function civicrm_api3_proveg_donation_submit($params) {
           'createfull',
           $contribution_data
         );
+        $sepa_mandate = reset($sepa_mandate['values']);
         // $extra_return_values['SepaMandate'] = $sepa_mandate;
 
         // Load contribution.
@@ -155,7 +157,6 @@ function civicrm_api3_proveg_donation_submit($params) {
             ));
           } else if ($sepa_mandate['entity_table'] == 'civicrm_contribution_recur') {
             $recurring_contribution_id = (int) $sepa_mandate['entity_id'];
-            $annual_amount = ((float) $params['amount']) / 100.00 * (float) $params['frequency'];
 
             $contribution = civicrm_api3('ContributionRecur','getsingle', array(
               'check_permissions' => 0,
@@ -211,6 +212,12 @@ function civicrm_api3_proveg_donation_submit($params) {
       $membership_data['end_date']   = date('Y-m-d', strtotime("{$start_date} +1 year -1 day"));
       $membership_data['join_date']  = date('Y-m-d');
 
+      // add annual amount
+      if ($annual_amount) {
+        $membership_data['membership_info.membership_annual'] = $annual_amount;
+      }
+
+
       // create membership
       CRM_ProvegAPI_CustomData::resolveCustomFields($membership_data);
       CRM_Core_Error::debug_log_message("Membership create: " . json_encode($membership_data));
@@ -219,29 +226,16 @@ function civicrm_api3_proveg_donation_submit($params) {
       // reload to get all data
       $membership = civicrm_api3('Membership', 'getsingle', ['id' => $membership['id']]);
 
-      // NOW: add more stuff
-      $membership_update = [
-          'id'         => $membership['id'],
-          'contact_id' => $membership['contact_id']
-      ];
-
-      // add mandate
+      // finally: set the payment contract
       if ($recurring_contribution_id) {
-        $membership_update['membership_info.membership_paid_through'] = $recurring_contribution_id;
+        $membership_update = [
+            'id'                                      => $membership['id'],
+            'contact_id'                              => $membership['contact_id'],
+            'membership_info.membership_paid_through' => $recurring_contribution_id];
+        CRM_ProvegAPI_CustomData::resolveCustomFields($membership_update);
+        CRM_Core_Error::debug_log_message("Membership update: " . json_encode($membership_update));
+        civicrm_api3('Membership', 'create', $membership_update);
       }
-
-      // add annual amount
-      if ($annual_amount) {
-        $membership_update['membership_type.membership_annual'] = $annual_amount;
-      }
-
-      // add number
-      CRM_ProvegAPI_CustomData::resolveCustomFields($membership_update);
-      CRM_Membership_NumberLogic::generateNewNumber($membership_update);
-
-      // and update
-      CRM_Core_Error::debug_log_message("Membership update: " . json_encode($membership_update));
-      civicrm_api3('Membership', 'create', $membership_update);
 
       // DISABLED: Include membership in extraReturnValues parameter.
       // I think this reveals a lot while being unnecessary
