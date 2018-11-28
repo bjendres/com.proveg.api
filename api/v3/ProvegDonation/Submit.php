@@ -32,6 +32,9 @@ function civicrm_api3_proveg_donation_submit($params) {
     CRM_Core_Error::debug_log_message('ProvegDonation.submit: ' . json_encode($params));
   }
 
+  // extract campaign_id (see PV-8280)
+  CRM_ProvegAPI_Submission::extractCampaign($params);
+
   $extra_return_values = array();
   $recurring_contribution_id = NULL;
   $annual_amount = NULL;
@@ -87,6 +90,7 @@ function civicrm_api3_proveg_donation_submit($params) {
     // Prepare contribution data.
     $contribution_data = array(
         'financial_type_id' => CRM_ProvegAPI_Submission::FINANCIAL_TYPE_ID,
+        'campaign_id'       => $params['campaign_id'],
         'contact_id'        => $contact_id,
         'total_amount'      => $params['amount'] / 100,
         'source'            => (!empty($params['contribution_source']) ? $params['contribution_source'] : CRM_ProvegAPI_Submission::CONTRIBUTION_SOURCE_DEFAULT),
@@ -134,11 +138,12 @@ function civicrm_api3_proveg_donation_submit($params) {
         }
 
         // Create SEPA mandate and contribution.
-        $contribution_data['type']       = ($params['frequency'] ? 'RCUR' : 'OOFF');
-        $contribution_data['iban']       = $params['iban'];
-        $contribution_data['bic']        = $params['bic'];
-        $contribution_data['amount']     = $params['amount'] / 100;
-        $contribution_data['start_date'] = CRM_ProvegAPI_Submission::getStartDate();
+        $contribution_data['type']        = ($params['frequency'] ? 'RCUR' : 'OOFF');
+        $contribution_data['iban']        = $params['iban'];
+        $contribution_data['bic']         = $params['bic'];
+        $contribution_data['creditor_id'] = CRM_ProvegAPI_Submission::CREDITOR_ID;
+        $contribution_data['amount']      = $params['amount'] / 100;
+        $contribution_data['start_date']  = CRM_ProvegAPI_Submission::getStartDate();
         $contribution_data['check_permissions'] = 0;
         $sepa_mandate = civicrm_api3(
           'SepaMandate',
@@ -195,10 +200,11 @@ function civicrm_api3_proveg_donation_submit($params) {
     // If requested, create membership for the contact.
     if (!empty($params['membership_type_id'])) {
       $membership_data = array(
-        'check_permissions'  => 0,
-        'membership_type_id' => $params['membership_type_id'],
-        'contact_id'         => $contact_id,
-        'source'             => CRM_Utils_Array::value('contribution_source', $params, CRM_ProvegAPI_Submission::CONTRIBUTION_SOURCE_DEFAULT),
+          'check_permissions'  => 0,
+          'membership_type_id' => $params['membership_type_id'],
+          'campaign_id'        => $params['campaign_id'],
+          'contact_id'         => $contact_id,
+          'source'             => CRM_Utils_Array::value('contribution_source', $params, CRM_ProvegAPI_Submission::CONTRIBUTION_SOURCE_DEFAULT),
       );
 
       // add subtype if given
@@ -282,6 +288,7 @@ function civicrm_api3_proveg_donation_submit($params) {
         'source_contact_id'  => CRM_Core_Session::singleton()->getLoggedInContactID(),
         'status_id'          => CRM_Core_OptionGroup::getValue('activity_status', 'Scheduled', 'name'),
         'target_id'          => $contact_id,
+        'campaign_id'        => $params['campaign_id'],
         'details'            => json_encode($params),
       );
       $activity = civicrm_api3('Activity', 'create', $activity_data);
@@ -394,7 +401,7 @@ function _civicrm_api3_proveg_donation_submit_spec(&$params) {
     'title'        => 'Payment instrument',
     'type'         => CRM_Utils_Type::T_STRING,
     'api.required' => 1,
-    'description'  => 'The payment method used for the donation.',
+    'description'  => 'The payment method used for the donation: sepa or paypal',
   );
   $params['iban'] = array(
     'name'         => 'iban',
@@ -423,6 +430,13 @@ function _civicrm_api3_proveg_donation_submit_spec(&$params) {
     'type'         => CRM_Utils_Type::T_INT,
     'api.required' => 0,
     'description'  => 'Whether to subscribe the contact to the configured newsletter group.',
+  );
+  $params['campaign_code'] = array(
+      'name'         => 'campaign_code',
+      'title'        => 'Campaign Code',
+      'type'         => CRM_Utils_Type::T_STRING,
+      'api.required' => 0,
+      'description'  => 'External identifier for a campaign',
   );
   $params['receive_date'] = array(
     'name'         => 'receive_date',
