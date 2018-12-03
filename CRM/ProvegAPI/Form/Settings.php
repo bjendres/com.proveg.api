@@ -137,6 +137,10 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
    * @throws CiviCRM_API3_Exception
    */
   protected function getList($entity, $id_field = 'id', $label_field = 'name', $params = []) {
+    if (empty($params['option.limit'])) {
+      $params['option.limit'] = 0;
+    }
+
     $list = [];
     $params['return'] = "{$id_field},{$label_field}";
     $results = civicrm_api3($entity, 'get', $params);
