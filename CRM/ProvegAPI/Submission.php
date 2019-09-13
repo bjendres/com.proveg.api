@@ -17,47 +17,6 @@
 class CRM_ProvegAPI_Submission {
 
   /**
-   * The default ID of the "Work" location type.
-   */
-  const LOCATION_TYPE_ID_WORK = 2;
-
-  /**
-   * The financial type to create contributions with.
-   */
-  const FINANCIAL_TYPE_ID = 1;
-
-  /**
-   * The ID of the group to use for newsletter registrations.
-   * TODO: Set to actual group ID.
-   */
-  const NEWSLETTER_GROUP_ID = 108;
-
-  /**
-   * The name of the payment method used for PayPal contributions.
-   * TODO: Set to actual pament instrument ID.
-   */
-  const PAYMENT_INSTRUMENT_ID_PAYPAL = 12;
-
-
-  /**
-   * The default value to use for the contribution source.
-   */
-  const CONTRIBUTION_SOURCE_DEFAULT = 'ProVeg API';
-
-  /**
-   * Buffer days to still collect the money,
-   *  i.e. you cannot submit a membership to start the 1st of may on april 30th,
-   *  because the mandate would not be collected any more
-   */
-  const CONTRIBUTION_BUFFER_DAYS = 5;
-
-  /**
-   * SEPA Creditor to be used
-   */
-  const CREDITOR_ID = 1;
-
-
-  /**
    * Retrieves the contact matching the given contact data or creates a new
    * contact.
    *
@@ -148,7 +107,7 @@ class CRM_ProvegAPI_Submission {
    * respecting the buffer days
    */
   public static function getStartDate() {
-    $buffer = self::CONTRIBUTION_BUFFER_DAYS;
+    $buffer = CRM_ProvegAPI_Configuration::getSetting('buffer_days', 5);
     $earliest = strtotime("now + {$buffer} days");
     while (date('j', $earliest) > 1) {
       // get to the next day
@@ -172,7 +131,10 @@ class CRM_ProvegAPI_Submission {
    *
    * @throws \CiviCRM_API3_Exception
    */
-  public static function shareWorkAddress($contact_id, $organisation_id, $location_type_id = self::LOCATION_TYPE_ID_WORK) {
+  public static function shareWorkAddress($contact_id, $organisation_id, $location_type_id = NULL) {
+    if ($location_type_id === NULL) {
+      $location_type_id = CRM_ProvegAPI_Configuration::getSetting('work_location_type_id', 2);
+    }
     if (empty($organisation_id)) {
       // Only if organisation exists.
       return FALSE;

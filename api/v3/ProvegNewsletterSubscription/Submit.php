@@ -60,7 +60,7 @@ function civicrm_api3_proveg_newsletter_subscription_submit($params) {
 
     $groupcontact = civicrm_api3('GroupContact', 'create', array(
       'check_permissions'  => 0,
-      'group_id'           => CRM_ProvegAPI_Submission::NEWSLETTER_GROUP_ID,
+      'group_id'           => CRM_ProvegAPI_Configuration::getSetting('newsletter_group', 1000),
       'contact_id'         => $contact_id,
       'status'             => (!empty($params['newsletter']) ? 'Added' : 'Removed'),
     ));

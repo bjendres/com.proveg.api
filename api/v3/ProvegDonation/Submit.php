@@ -89,11 +89,11 @@ function civicrm_api3_proveg_donation_submit($params) {
 
     // Prepare contribution data.
     $contribution_data = array(
-        'financial_type_id' => CRM_ProvegAPI_Submission::FINANCIAL_TYPE_ID,
+        'financial_type_id' => CRM_ProvegAPI_Configuration::getSetting('financial_type_id', 1),
         'campaign_id'       => $params['campaign_id'],
         'contact_id'        => $contact_id,
         'total_amount'      => $params['amount'] / 100,
-        'source'            => (!empty($params['contribution_source']) ? $params['contribution_source'] : CRM_ProvegAPI_Submission::CONTRIBUTION_SOURCE_DEFAULT),
+        'source'            => CRM_ProvegAPI_Configuration::getSource($params, 'contribution_source'),
         'receive_date'      => date('YmdHis', (!empty($params['receive_date']) ? $params['receive_date'] : REQUEST_TIME)),
     );
 
@@ -141,7 +141,7 @@ function civicrm_api3_proveg_donation_submit($params) {
         $contribution_data['type']        = ($params['frequency'] ? 'RCUR' : 'OOFF');
         $contribution_data['iban']        = $params['iban'];
         $contribution_data['bic']         = $params['bic'];
-        $contribution_data['creditor_id'] = CRM_ProvegAPI_Submission::CREDITOR_ID;
+        $contribution_data['creditor_id'] = CRM_ProvegAPI_Configuration::getSetting('sepa_creditor_id', 1);
         $contribution_data['amount']      = $params['amount'] / 100;
         $contribution_data['start_date']  = CRM_ProvegAPI_Submission::getStartDate();
         $contribution_data['check_permissions'] = 0;
@@ -178,7 +178,7 @@ function civicrm_api3_proveg_donation_submit($params) {
 
       // PayPal.
       case 'paypal':
-        $contribution_data['payment_instrument_id'] = CRM_ProvegAPI_Submission::PAYMENT_INSTRUMENT_ID_PAYPAL;
+        $contribution_data['payment_instrument_id']  = CRM_ProvegAPI_Configuration::getSetting('paypal_instrument_id', 12);
         $contribution_data['contribution_status_id'] = 'Completed';
         $contribution_data['check_permissions'] = 0;
         $contribution = civicrm_api3(
@@ -204,7 +204,7 @@ function civicrm_api3_proveg_donation_submit($params) {
           'membership_type_id' => $params['membership_type_id'],
           'campaign_id'        => $params['campaign_id'],
           'contact_id'         => $contact_id,
-          'source'             => CRM_Utils_Array::value('contribution_source', $params, CRM_ProvegAPI_Submission::CONTRIBUTION_SOURCE_DEFAULT),
+          'source'             => CRM_ProvegAPI_Configuration::getSource($params, 'contribution_source'),
       );
 
       // add subtype if given
