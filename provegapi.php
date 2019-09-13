@@ -21,7 +21,8 @@ use CRM_ProvegAPI_ExtensionUtil as E;
  * Define custom (Drupal) permissions
  */
 function provegapi_civicrm_permission(&$permissions) {
-  $permissions['access Donation API'] = 'API: access ProvegDonation API';
+  //$permissions['access Donation API'] = 'API: access ProvegDonation API';
+  $permissions['access ProVeg API'] = 'API: access Proveg API';
 }
 
 /**
@@ -29,8 +30,12 @@ function provegapi_civicrm_permission(&$permissions) {
  */
 function provegapi_civicrm_alterAPIPermissions($entity, $action, &$params, &$permissions) {
   // ProvegDonation
-  $permissions['proveg_donation']['submit']                = array('access Donation API');
-  $permissions['proveg_newsletter_subscription']['submit'] = array('access Donation API');
+  //$permissions['proveg_donation']['submit']                = array('access Donation API');
+  //$permissions['proveg_newsletter_subscription']['submit'] = array('access Donation API');
+
+  // General ProVeg API
+  $permissions['proveg_selfservice']['contactbyhash'] = ['access ProVeg API'];
+  $permissions['proveg_selfservice']['contactdata']   = ['access ProVeg API'];
 }
 
 
@@ -87,9 +92,10 @@ function provegapi_civicrm_uninstall() {
 function provegapi_civicrm_enable() {
   _provegapi_civix_civicrm_enable();
 
-  require_once 'CRM/ProvegAPI/CustomData.php';
-  $customData = new CRM_ProvegAPI_CustomData('com.proveg.api');
-  $customData->syncOptionGroup(__DIR__ . '/resources/option_group_activity_type.json');
+  // deprecated:
+  //  require_once 'CRM/ProvegAPI/CustomData.php';
+  //  $customData = new CRM_ProvegAPI_CustomData('com.proveg.api');
+  //  $customData->syncOptionGroup(__DIR__ . '/resources/option_group_activity_type.json');
 }
 
 /**

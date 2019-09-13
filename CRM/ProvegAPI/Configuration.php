@@ -55,4 +55,13 @@ class CRM_ProvegAPI_Configuration {
     }
   }
 
+
+  /**
+   * Should all API calls be logged (debugging)
+   * @return boolean
+   */
+  public static function logAPICalls() {
+    $log_calls = self::getSetting('log_api_calls', false);
+    return !empty($log_calls);
+  }
 }

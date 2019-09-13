@@ -30,6 +30,8 @@ class CRM_ProvegAPI_Submission {
    *   was found and no new contact could be created.
    * @throws \CiviCRM_API3_Exception | API_Exception
    *   When invalid data was given.
+   *
+   * @deprecated ProvegDonation.submit was discontinued
    */
   public static function getContact($contact_type, $contact_data) {
     // If no parameters are given, do nothing.

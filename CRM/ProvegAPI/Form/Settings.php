@@ -1,7 +1,7 @@
 <?php
 /*------------------------------------------------------------+
 | ProVeg API extension                                        |
-| Copyright (C) 2017 SYSTOPIA                                 |
+| Copyright (C) 2017-2019 SYSTOPIA                            |
 | Author: B. Endres (endres@systopia.de)                      |
 |         J. Schuppe (schuppe@systopia.de)                    |
 +-------------------------------------------------------------+
@@ -25,6 +25,26 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
 
   public function buildQuickForm() {
 
+    // Generic settings
+    $this->add(
+        'checkbox',
+        'log_api_calls',
+        E::ts('Log all API calls')
+    );
+
+    // Configuration for Mailing Self-Service
+    $this->add(
+        'select',
+        'selfservice_xcm_profile',
+        E::ts('XCM Profile'),
+        CRM_Xcm_Configuration::getProfileList(),
+        TRUE
+    );
+
+
+
+
+    /** Configuration for Donation API (discontinued)
     // add form elements
     $this->add(
       'select',
@@ -66,7 +86,6 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
         TRUE
     );
 
-
     $this->add(
         'select',
         'newsletter_group',
@@ -83,18 +102,16 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
         TRUE
     );
 
+    */
 
 
-    $this->addButtons(array(
-      array(
-        'type' => 'submit',
-        'name' => E::ts('Save'),
-        'isDefault' => TRUE,
-      ),
-    ));
-
-    // export form elements
-    $this->assign('elementNames', $this->getRenderableElementNames());
+    $this->addButtons([
+        [
+            'type'      => 'submit',
+            'name'      => E::ts('Save'),
+            'isDefault' => TRUE,
+        ],
+    ]);
 
     $current_values = CRM_Core_BAO_Setting::getItem('com.proveg.api', 'pvapi_config');
     $this->setDefaults($current_values);
@@ -103,7 +120,7 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
   }
 
   public function postProcess() {
-    $values = $this->exportValues();
+    $values = $this->exportValues(null, true);
     CRM_Core_BAO_Setting::setItem($values, 'com.proveg.api', 'pvapi_config');
     parent::postProcess();
   }
