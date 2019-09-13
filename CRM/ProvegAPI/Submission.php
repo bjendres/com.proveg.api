@@ -51,6 +51,10 @@ class CRM_ProvegAPI_Submission {
    */
   const CONTRIBUTION_BUFFER_DAYS = 5;
 
+  /**
+   * SEPA Creditor to be used
+   */
+  const CREDITOR_ID = 1;
 
 
   /**
@@ -105,6 +109,37 @@ class CRM_ProvegAPI_Submission {
     }
 
     return $contact['id'];
+  }
+
+  /**
+   * Will scan the parameters for campaign information
+   *  and set campaign_id in the parameters.
+   *
+   * If no campaign information is found, it will still set the campaign_id
+   *  to an empty string
+   *
+   * @param $params array call data
+   */
+  public static function extractCampaign(&$params) {
+    $campaign_id = CRM_Utils_Array::value('campaign_id', $params, '');
+    if (is_numeric($campaign_id)) {
+      $campaign_id = (int) $campaign_id;
+    } else {
+      $campaign_id = '';
+      if (!empty($params['campaign_code'])) {
+        $campaign_code = strtoupper(trim($params['campaign_code']));
+        $campaign_query = civicrm_api3('Campaign', 'get', [
+            'external_identifier' => $campaign_code,
+            'is_active'           => 1
+        ]);
+        if (empty($campaign_query['id'])) {
+          CRM_Core_Error::debug_log_message("PVAPI: Campaign code '{$campaign_code}' not (uniquely) identified!");
+        } else {
+          $campaign_id = (int) $campaign_query['id'];
+        }
+      }
+    }
+    $params['campaign_id'] = $campaign_id;
   }
 
   /**
