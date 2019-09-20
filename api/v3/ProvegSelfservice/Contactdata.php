@@ -52,6 +52,14 @@ function civicrm_api3_proveg_selfservice_contactdata($params)
         ]);
       }
 
+      // update interests
+      if (!empty($params['custom_146'])) {
+        civicrm_api3('Contact', 'create', [
+            'id'         => $params['id'],
+            'custom_146' => [$params['custom_146']]
+        ]);
+      }
+
       return civicrm_api3_create_success("contact updated");
     } catch (Exception $ex) {
       // not found
