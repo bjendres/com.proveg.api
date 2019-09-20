@@ -56,7 +56,7 @@ function civicrm_api3_proveg_selfservice_contactdata($params)
       if (!empty($params['custom_146'])) {
         civicrm_api3('Contact', 'create', [
             'id'         => $params['id'],
-            'custom_146' => [$params['custom_146']]
+            'custom_146' => $params['custom_146']
         ]);
       }
 
