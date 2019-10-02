@@ -38,6 +38,20 @@ function provegapi_civicrm_alterAPIPermissions($entity, $action, &$params, &$per
   $permissions['proveg_selfservice']['contactdata']   = ['access ProVeg API'];
 }
 
+/**
+ * Hook implementation: New Tokens
+ */
+function proevg_civicrm_tokens( &$tokens ) {
+  CRM_ProvegAPI_HashLinks::addTokens($tokens);
+}
+
+/**
+ * Hook implementation: New Tokens
+ */
+function proevg_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(), $context = null) {
+  CRM_ProvegAPI_HashLinks::tokenValues($values, $cids, $job, $tokens, $context);
+}
+
 
 /**
  * Implements hook_civicrm_config().
