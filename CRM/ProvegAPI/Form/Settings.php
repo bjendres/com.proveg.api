@@ -23,6 +23,8 @@ use CRM_ProvegAPI_ExtensionUtil as E;
  */
 class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
 
+  const HASH_LINK_COUNT = 10;
+
   public function buildQuickForm() {
 
     // Generic settings
@@ -41,6 +43,35 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
         TRUE
     );
 
+    // Configuration for hash links (personalised links)
+    $hash_link_ids = range(1, self::HASH_LINK_COUNT);
+    $this->assign("hash_links", $hash_link_ids);
+    foreach ($hash_link_ids as $i) {
+      $this->add(
+          'text',
+          "hash_link_{$i}",
+          E::ts('Token Key'),
+          []
+      );
+      $this->add(
+          'text',
+          "hash_link_name_{$i}",
+          E::ts('Token Label'),
+          []
+      );
+      $this->add(
+          'textarea',
+          "hash_link_html_{$i}",
+          E::ts('Link HTML'),
+          []
+      );
+      $this->add(
+          'textarea',
+          "hash_link_fallback_html_{$i}",
+          E::ts('Fallback HTML'),
+          []
+      );
+    }
 
 
 
