@@ -266,7 +266,7 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
     $query = civicrm_api3('MessageTemplate', 'get', [
         'option.limit' => 0,
         'is_active'    => 1,
-        'is_reserved'  => 0,
+//        'is_reserved'  => 0,
         'return'       => 'id,msg_title'
     ]);
     foreach ($query['values'] as $template) {
