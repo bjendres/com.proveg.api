@@ -177,10 +177,13 @@ class CRM_ProvegAPI_HashLinks {
    * @see https://docs.civicrm.org/dev/en/master/hooks/hook_civicrm_tokenValues
    */
   public static function tokenValues(&$values, $cids, $job = null, $tokens = array(), $context = null) {
-    // find out which ones are being used first
-    $link_tokens_configured = self::getLinkTokens();
+    // get normalise $link_tokens_used
     $link_tokens_used = CRM_Utils_Array::value(self::PERSONALISED_LINKS, $tokens, []);
-    $links_to_be_populated = array_intersect($link_tokens_used, $link_tokens_configured);
+    if (!isset($link_tokens_used[0])) $link_tokens_used = array_keys($link_tokens_used);
+
+    // find out if ours are being used
+    $link_tokens_configured = self::getLinkTokens();
+    $links_to_be_populated  = array_intersect($link_tokens_used, $link_tokens_configured);
     if (empty($links_to_be_populated)) {
       return;
     }
