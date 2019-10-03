@@ -51,25 +51,27 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
           'text',
           "hash_link_{$i}",
           E::ts('Token Key'),
-          []
+          ['placeholder' => E::ts("Enter key to activate")]
       );
+      $this->addRule("hash_link_{$i}", E::ts("The name mustn't contain special characters or spaces."), 'alphanumeric');
+
       $this->add(
           'text',
           "hash_link_name_{$i}",
           E::ts('Token Label'),
-          []
+          ['class' => 'big']
       );
       $this->add(
           'textarea',
           "hash_link_html_{$i}",
           E::ts('Link HTML'),
-          []
+          ['class' => 'big']
       );
       $this->add(
           'textarea',
           "hash_link_fallback_html_{$i}",
           E::ts('Fallback HTML'),
-          []
+          ['class' => 'big']
       );
     }
 
@@ -144,14 +146,53 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
         ],
     ]);
 
+    // add basic settings
     $current_values = CRM_Core_BAO_Setting::getItem('com.proveg.api', 'pvapi_config');
-    $this->setDefaults($current_values);
+    if (is_array($current_values)) {
+      unset($current_values['qfKey'], $current_values['entryURL']);
+      $this->setDefaults($current_values);
+    }
+
+    // add hash link specs
+    $link_specs = CRM_ProvegAPI_HashLinks::getLinks();
+    foreach (range(1, self::HASH_LINK_COUNT) as $i) {
+      if (isset($link_specs[$i - 1])) {
+        $spec = $link_specs[$i - 1];
+        $this->setDefaults([
+            "hash_link_{$i}"               => CRM_Utils_Array::value('name', $spec, ''),
+            "hash_link_name_{$i}"          => CRM_Utils_Array::value('label', $spec, ''),
+            "hash_link_html_{$i}"          => CRM_Utils_Array::value('link_html', $spec, ''),
+            "hash_link_fallback_html_{$i}" => CRM_Utils_Array::value('fallback_html', $spec, ''),
+        ]);
+      }
+    }
 
     parent::buildQuickForm();
   }
 
-  public function postProcess() {
+
+
+  public function postProcess()
+  {
     $values = $this->exportValues(null, true);
+    unset($values['qfKey'], $values['entryURL']);
+
+    // extract and store hash link specs
+    $hash_link_specs = [];
+    foreach (range(1, self::HASH_LINK_COUNT) as $i) {
+      if (!empty($values["hash_link_{$i}"])) {
+        $hash_link_specs[] = [
+            'name'          => $values["hash_link_{$i}"],
+            'label'         => CRM_Utils_Array::value("hash_link_name_{$i}", $values, $values["hash_link_{$i}"]),
+            'link_html'     => html_entity_decode($values["hash_link_html_{$i}"]),
+            'fallback_html' => html_entity_decode($values["hash_link_fallback_html_{$i}"])
+        ];
+      }
+      unset($values["hash_link_{$i}"], $values["hash_link_name_{$i}"], $values["hash_link_html_{$i}"], $values["hash_link_fallback_html_{$i}"]);
+    }
+    Civi::settings()->set('proveg_personalised_links', $hash_link_specs);
+
+    // store the rest
     CRM_Core_BAO_Setting::setItem($values, 'com.proveg.api', 'pvapi_config');
     parent::postProcess();
   }

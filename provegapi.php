@@ -41,14 +41,14 @@ function provegapi_civicrm_alterAPIPermissions($entity, $action, &$params, &$per
 /**
  * Hook implementation: New Tokens
  */
-function proevg_civicrm_tokens( &$tokens ) {
+function provegapi_civicrm_tokens( &$tokens ) {
   CRM_ProvegAPI_HashLinks::addTokens($tokens);
 }
 
 /**
  * Hook implementation: New Tokens
  */
-function proevg_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(), $context = null) {
+function provegapi_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(), $context = null) {
   CRM_ProvegAPI_HashLinks::tokenValues($values, $cids, $job, $tokens, $context);
 }
 

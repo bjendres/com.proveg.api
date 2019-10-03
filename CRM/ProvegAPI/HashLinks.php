@@ -79,19 +79,6 @@ class CRM_ProvegAPI_HashLinks {
     return $hashes;
   }
 
-
-
-  /**
-   * Handles civicrm_tokens hook
-   * @see https://docs.civicrm.org/dev/en/master/hooks/hook_civicrm_tokens
-   */
-  public static function addTokens(&$tokens) {
-    $links = self::getLinks();
-    foreach ($links as $link) {
-      $tokens[self::PERSONALISED_LINKS][self::PERSONALISED_LINKS . ".{$link['name']}"] = $link['label'];
-    }
-  }
-
   /**
    * Check the contact list for email conflicts: an
    *  primary or bulk email address that is used by other contacts
@@ -112,11 +99,12 @@ class CRM_ProvegAPI_HashLinks {
       $email_query = CRM_Core_DAO::executeQuery("
         SELECT 
             contact.id    AS contact_id,
-            primary.email AS primary_email,
+            main.email    AS primary_email,
             bulk.email    AS bulk_email
         FROM civicrm_contact    contact
-        LEFT JOIN civicrm_email primary ON primary.contact_id = contact.id AND primary.is_primary = 1
-        LEFT JOIN civicrm_email bulk    ON bulk.contact_id = contact.id    AND bulk.is_bulk = 1
+        LEFT JOIN civicrm_email main ON main.contact_id = contact.id AND main.is_primary  = 1
+        LEFT JOIN civicrm_email bulk ON bulk.contact_id = contact.id AND bulk.is_bulkmail = 1
+        WHERE contact.id IN ({$contact_id_list})
         GROUP BY contact.id");
       while ($email_query->fetch()) {
         if ($email_query->primary_email) {
@@ -164,6 +152,20 @@ class CRM_ProvegAPI_HashLinks {
     return $conflicted_contact_ids;
   }
 
+
+
+
+  /**
+   * Handles civicrm_tokens hook
+   * @see https://docs.civicrm.org/dev/en/master/hooks/hook_civicrm_tokens
+   */
+  public static function addTokens(&$tokens) {
+    $links = self::getLinks();
+    foreach ($links as $link) {
+      $tokens[self::PERSONALISED_LINKS][self::PERSONALISED_LINKS . ".{$link['name']}"] = $link['label'];
+    }
+  }
+
   /**
    * Handles civicrm_tokenValues hook
    * @param $values - array of values, keyed by contact id
@@ -209,7 +211,7 @@ class CRM_ProvegAPI_HashLinks {
           $values[$cid][self::PERSONALISED_LINKS. ".{$token}"] = $link['fallback_html'];
         } else {
           // all good -> set the link text
-          $values[$cid][self::PERSONALISED_LINKS. ".{$token}"] = preg_replace('\{hash\}', $contact_hashes[$cid], $link['link_html']);
+          $values[$cid][self::PERSONALISED_LINKS . ".{$token}"] = preg_replace('/\{hash\}/', $contact_hashes[$cid], $link['link_html']);
         }
       }
     }
