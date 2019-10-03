@@ -36,6 +36,7 @@ function provegapi_civicrm_alterAPIPermissions($entity, $action, &$params, &$per
   // General ProVeg API
   $permissions['proveg_selfservice']['contactbyhash'] = ['access ProVeg API'];
   $permissions['proveg_selfservice']['contactdata']   = ['access ProVeg API'];
+  $permissions['proveg_selfservice']['sendlink']      = ['access ProVeg API'];
 }
 
 /**

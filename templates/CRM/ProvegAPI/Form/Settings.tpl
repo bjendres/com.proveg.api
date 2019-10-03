@@ -28,6 +28,17 @@
   <div class="content">{$form.selfservice_xcm_profile.html}</div>
   <div class="clear"></div>
 </div>
+<div class="crm-section">
+  <div class="label">{$form.selfservice_link_request_template.label}</div>
+  <div class="content">{$form.selfservice_link_request_template.html}</div>
+  <div class="clear"></div>
+</div>
+<div class="crm-section">
+  <div class="label">{$form.selfservice_link_request_template_fallback.label}</div>
+  <div class="content">{$form.selfservice_link_request_template_fallback.html}</div>
+  <div class="clear"></div>
+</div>
+
 
 <br/>
 <h3>{ts domain="com.proveg.api"}Personalised Links (Hash Links){/ts}</h3>

@@ -43,6 +43,23 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
         TRUE
     );
 
+    // Configuration Self-Service link request
+    $templates = $this->getMessageTemplates();
+    $this->add(
+        'select',
+        'selfservice_link_request_template',
+        E::ts('E-Mail Template: Email known'),
+        $templates,
+        FALSE
+    );
+    $this->add(
+        'select',
+        'selfservice_link_request_template_fallback',
+        E::ts('E-Mail Template: Email <i>not</i> known'),
+        $templates,
+        FALSE
+    );
+
     // Configuration for hash links (personalised links)
     $hash_link_ids = range(1, self::HASH_LINK_COUNT);
     $this->assign("hash_links", $hash_link_ids);
@@ -237,5 +254,24 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
       $list[$entry[$id_field]] = $entry[$label_field];
     }
     return $list;
+  }
+
+  /**
+   * Get a list of eligible message templates
+   *
+   * @return array
+   */
+  protected function getMessageTemplates() {
+    $templates = ['' => E::ts("disabled")];
+    $query = civicrm_api3('MessageTemplate', 'get', [
+        'option.limit' => 0,
+        'is_active'    => 1,
+        'is_reserved'  => 0,
+        'return'       => 'id,msg_title'
+    ]);
+    foreach ($query['values'] as $template) {
+      $templates[$template['id']] = $template['msg_title'];
+    }
+    return $templates;
   }
 }
