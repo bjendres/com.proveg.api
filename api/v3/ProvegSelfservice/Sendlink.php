@@ -34,9 +34,10 @@ function civicrm_api3_proveg_selfservice_sendlink($params)
   // find contact ids for the given email
   $contact_ids = [];
   $query = civicrm_api3('Email', 'get', [
-      'option.limit' => 0,
-      'email'        => trim($params['email']),
-      'return'       => 'contact_id'
+      'check_permissions' => 0,
+      'option.limit'      => 0,
+      'email'             => trim($params['email']),
+      'return'            => 'contact_id'
   ]);
   foreach ($query['values'] as $email) {
     $contact_ids[] = $email['contact_id'];
@@ -45,10 +46,11 @@ function civicrm_api3_proveg_selfservice_sendlink($params)
   // remove the contacts that are deleted
   if ($contact_ids) {
     $query = civicrm_api3('Contact', 'get', [
-        'option.limit' => 0,
-        'id'           => ['IN' => $contact_ids],
-        'is_deleted'   => 1,
-        'return'       => 'id',
+        'check_permissions' => 0,
+        'option.limit'      => 0,
+        'id'                => ['IN' => $contact_ids],
+        'is_deleted'        => 1,
+        'return'            => 'id',
     ]);
     foreach ($query['values'] as $deleted_contact) {
       unset($contact_ids[$deleted_contact['id']]);
@@ -59,10 +61,11 @@ function civicrm_api3_proveg_selfservice_sendlink($params)
     // we found a contact -> send to the first one
     $contact_id = reset($contact_ids);
     civicrm_api3('MessageTemplate', 'send', [
-        'id'         => $template_email_known,
-        'to_name'    => civicrm_api3('Contact', 'getvalue', ['id' => $contact_id, 'return' => 'display_name']),
-        'contact_id' => $contact_id,
-        'to_email'   => trim($params['email']),
+        'check_permissions' => 0,
+        'id'                => $template_email_known,
+        'to_name'           => civicrm_api3('Contact', 'getvalue', ['id' => $contact_id, 'return' => 'display_name']),
+        'contact_id'        => $contact_id,
+        'to_email'          => trim($params['email']),
     ]);
 
     return civicrm_api3_create_success("email sent");
@@ -70,8 +73,9 @@ function civicrm_api3_proveg_selfservice_sendlink($params)
   } elseif (!$contact_ids && $template_email_unknown) {
     // no contact found
     civicrm_api3('MessageTemplate', 'send', [
-        'id'         => $template_email_unknown,
-        'to_email'   => trim($params['email']),
+        'check_permissions' => 0,
+        'id'                => $template_email_unknown,
+        'to_email'          => trim($params['email']),
     ]);
 
     return civicrm_api3_create_success("email sent");
