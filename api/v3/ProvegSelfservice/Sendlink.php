@@ -58,8 +58,8 @@ function civicrm_api3_proveg_selfservice_sendlink($params)
   }
 
   if ($contact_ids && $template_email_known) {
-    // we found a contact -> send to the first one
-    $contact_id = reset($contact_ids);
+    // we found a contact -> send to the one with the lowest ID
+    $contact_id = min($contact_ids);
     civicrm_api3('MessageTemplate', 'send', [
         'check_permissions' => 0,
         'id'                => $template_email_known,
