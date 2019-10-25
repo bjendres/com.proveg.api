@@ -216,7 +216,8 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
     }
     Civi::settings()->set('proveg_personalised_links', $hash_link_specs);
 
-    // store the rest
+    // format + store the rest
+    $values['selfservice_link_request_sender'] = html_entity_decode($values['selfservice_link_request_sender']);
     CRM_Core_BAO_Setting::setItem($values, 'com.proveg.api', 'pvapi_config');
     parent::postProcess();
   }
