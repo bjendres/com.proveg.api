@@ -29,6 +29,11 @@
   <div class="clear"></div>
 </div>
 <div class="crm-section">
+  <div class="label">{$form.selfservice_link_request_sender.label}</div>
+  <div class="content">{$form.selfservice_link_request_sender.html}</div>
+  <div class="clear"></div>
+</div>
+<div class="crm-section">
   <div class="label">{$form.selfservice_link_request_template.label}</div>
   <div class="content">{$form.selfservice_link_request_template.html}</div>
   <div class="clear"></div>

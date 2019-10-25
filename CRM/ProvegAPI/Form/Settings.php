@@ -59,6 +59,13 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
         $templates,
         FALSE
     );
+    $this->add(
+        'text',
+        'selfservice_link_request_sender',
+        E::ts('Sender E-Mail'),
+        ['class' => 'huge'],
+        TRUE
+    );
 
     // Configuration for hash links (personalised links)
     $hash_link_ids = range(1, self::HASH_LINK_COUNT);

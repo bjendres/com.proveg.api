@@ -64,6 +64,7 @@ function civicrm_api3_proveg_selfservice_sendlink($params)
         'check_permissions' => 0,
         'id'                => $template_email_known,
         'to_name'           => civicrm_api3('Contact', 'getvalue', ['id' => $contact_id, 'return' => 'display_name']),
+        'from'              => CRM_ProvegAPI_Configuration::getSetting('selfservice_link_request_sender'),
         'contact_id'        => $contact_id,
         'to_email'          => trim($params['email']),
     ]);
@@ -75,6 +76,7 @@ function civicrm_api3_proveg_selfservice_sendlink($params)
     civicrm_api3('MessageTemplate', 'send', [
         'check_permissions' => 0,
         'id'                => $template_email_unknown,
+        'from'              => CRM_ProvegAPI_Configuration::getSetting('selfservice_link_request_sender'),
         'to_email'          => trim($params['email']),
     ]);
 
