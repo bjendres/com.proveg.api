@@ -47,15 +47,22 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
     $templates = $this->getMessageTemplates();
     $this->add(
         'select',
-        'selfservice_link_request_template',
-        E::ts('E-Mail Template: Email known'),
+        'selfservice_link_request_template_contact_known',
+        E::ts('E-Mail Template for Case: Email is known'),
         $templates,
         FALSE
     );
     $this->add(
         'select',
-        'selfservice_link_request_template_fallback',
-        E::ts('E-Mail Template: Email <i>not</i> known'),
+        'selfservice_link_request_template_contact_unknown',
+        E::ts('E-Mail Template for Case: Email is <i>not</i> known'),
+        $templates,
+        FALSE
+    );
+    $this->add(
+        'select',
+        'selfservice_link_request_template_contact_ambiguous',
+        E::ts('E-Mail Template for Case: Email is <i>ambiguous</i>'),
         $templates,
         FALSE
     );
@@ -274,7 +281,7 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
     $query = civicrm_api3('MessageTemplate', 'get', [
         'option.limit' => 0,
         'is_active'    => 1,
-//        'is_reserved'  => 0,
+        'workflow_id'  => ['IS NULL' => 1],
         'return'       => 'id,msg_title'
     ]);
     foreach ($query['values'] as $template) {

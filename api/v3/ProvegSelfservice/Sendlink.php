@@ -28,8 +28,9 @@ function civicrm_api3_proveg_selfservice_sendlink($params)
   CRM_ProvegAPI_Processor::preprocessCall($params, 'ProvegSelfservice.sendlink');
 
   // get templates
-  $template_email_known   = (int) CRM_ProvegAPI_Configuration::getSetting('selfservice_link_request_template');
-  $template_email_unknown = (int) CRM_ProvegAPI_Configuration::getSetting('selfservice_link_request_template_fallback');
+  $template_email_known     = (int) CRM_ProvegAPI_Configuration::getSetting('selfservice_link_request_template_contact_known');
+  $template_email_unknown   = (int) CRM_ProvegAPI_Configuration::getSetting('selfservice_link_request_template_contact_unknown');
+  $template_email_ambiguous = (int) CRM_ProvegAPI_Configuration::getSetting('selfservice_link_request_template_contact_ambiguous');
 
   // find contact ids for the given email
   $contact_ids = [];
@@ -57,36 +58,54 @@ function civicrm_api3_proveg_selfservice_sendlink($params)
     }
   }
 
-  if ($contact_ids && $template_email_known) {
-    // we found a contact -> send to the one with the lowest ID
-    $contact_id = min($contact_ids);
-    civicrm_api3('MessageTemplate', 'send', [
-        'check_permissions' => 0,
-        'id'                => $template_email_known,
-        'to_name'           => civicrm_api3('Contact', 'getvalue', ['id' => $contact_id, 'return' => 'display_name']),
-        'from'              => CRM_ProvegAPI_Configuration::getSetting('selfservice_link_request_sender'),
-        'contact_id'        => $contact_id,
-        'to_email'          => trim($params['email']),
-    ]);
+  switch (count($contact_ids)) {
+    case 0: // contact unknown
+      if ($template_email_unknown) {
+        civicrm_api3('MessageTemplate', 'send', [
+            'check_permissions' => 0,
+            'id'                => $template_email_unknown,
+            'from'              => CRM_ProvegAPI_Configuration::getSetting('selfservice_link_request_sender'),
+            'to_email'          => trim($params['email']),
+        ]);
+        return civicrm_api3_create_success("email sent");
+      }
+      break;
 
-    return civicrm_api3_create_success("email sent");
+    case 1: // contact known
+      if ($template_email_known) {
+        $contact_id = min($contact_ids);
+        civicrm_api3('MessageTemplate', 'send', [
+            'check_permissions' => 0,
+            'id'                => $template_email_known,
+            'to_name'           => civicrm_api3('Contact', 'getvalue', ['id' => $contact_id, 'return' => 'display_name']),
+            'from'              => CRM_ProvegAPI_Configuration::getSetting('selfservice_link_request_sender'),
+            'contact_id'        => $contact_id,
+            'to_email'          => trim($params['email']),
+        ]);
+        return civicrm_api3_create_success("email sent");
+      }
+      break;
 
-  } elseif (!$contact_ids && $template_email_unknown) {
-    // no contact found
-    civicrm_api3('MessageTemplate', 'send', [
-        'check_permissions' => 0,
-        'id'                => $template_email_unknown,
-        'from'              => CRM_ProvegAPI_Configuration::getSetting('selfservice_link_request_sender'),
-        'to_email'          => trim($params['email']),
-    ]);
-
-    return civicrm_api3_create_success("email sent");
-
-  } else {
-    // no template set for this case -> do nothing
-    Civi::log()->debug("ProvegSelfservice.sendlink requested but not enabled");
-    civicrm_api3_create_error("disabled");
+    default: // contact ambiguous
+      if ($template_email_ambiguous) {
+        // we found a contact -> send to the one with the lowest ID
+        $contact_id = min($contact_ids);
+        civicrm_api3('MessageTemplate', 'send', [
+            'check_permissions' => 0,
+            'id'                => $template_email_ambiguous,
+            'to_name'           => civicrm_api3('Contact', 'getvalue', ['id' => $contact_id, 'return' => 'display_name']),
+            'from'              => CRM_ProvegAPI_Configuration::getSetting('selfservice_link_request_sender'),
+            'contact_id'        => $contact_id,
+            'to_email'          => trim($params['email']),
+        ]);
+        return civicrm_api3_create_success("email sent");
+      }
+      break;
   }
+
+  // no template set for this case -> do nothing
+  Civi::log()->debug("ProvegSelfservice.sendlink requested but not enabled. Configure the templates");
+  civicrm_api3_create_error("disabled");
 }
 
 /**

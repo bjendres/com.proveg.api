@@ -34,13 +34,18 @@
   <div class="clear"></div>
 </div>
 <div class="crm-section">
-  <div class="label">{$form.selfservice_link_request_template.label}</div>
-  <div class="content">{$form.selfservice_link_request_template.html}</div>
+  <div class="label">{$form.selfservice_link_request_template_contact_known.label}</div>
+  <div class="content">{$form.selfservice_link_request_template_contact_known.html}</div>
   <div class="clear"></div>
 </div>
 <div class="crm-section">
-  <div class="label">{$form.selfservice_link_request_template_fallback.label}</div>
-  <div class="content">{$form.selfservice_link_request_template_fallback.html}</div>
+  <div class="label">{$form.selfservice_link_request_template_contact_unknown.label}</div>
+  <div class="content">{$form.selfservice_link_request_template_contact_unknown.html}</div>
+  <div class="clear"></div>
+</div>
+<div class="crm-section">
+  <div class="label">{$form.selfservice_link_request_template_contact_ambiguous.label}</div>
+  <div class="content">{$form.selfservice_link_request_template_contact_ambiguous.html}</div>
   <div class="clear"></div>
 </div>
 
