@@ -23,6 +23,7 @@
   <comments></comments>
   <requires>
     <ext>de.systopia.xcm</ext>
+    <ext>de.systopia.selfservice</ext>
   </requires>
   <civix>
     <namespace>CRM/ProvegAPI</namespace>

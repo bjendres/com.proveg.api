@@ -30,7 +30,7 @@ function civicrm_api3_proveg_selfservice_contactbyhash($params) {
   if (!empty($params['hash'])) {
     try {
       // first, load the contact base data
-      $contact_id = CRM_ProvegAPI_Processor::getContactIDbyHash($params['hash']);
+      $contact_id =  CRM_Selfservice_HashLinks::getContactIdFromHash($params['hash']);
       $data = civicrm_api3('Contact', 'getsingle', [
           'id'                => $contact_id,
           'check_permissions' => 0,

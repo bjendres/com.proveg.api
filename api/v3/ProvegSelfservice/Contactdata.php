@@ -30,7 +30,7 @@ function civicrm_api3_proveg_selfservice_contactdata($params)
   if (!empty($params['hash'])) {
     try {
       // identify the contact
-      $params['id'] = CRM_ProvegAPI_Processor::getContactIDbyHash($params['hash']);
+      $params['id'] = CRM_Selfservice_HashLinks::getContactIdFromHash($params['hash']);
 
       // add xcm profile
       $params['xcm_profile'] = CRM_ProvegAPI_Configuration::getSetting('selfservice_xcm_profile');
