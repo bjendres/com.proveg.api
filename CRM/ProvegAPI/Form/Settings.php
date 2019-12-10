@@ -42,6 +42,22 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
     );
 
 
+//    Configuration ProvegMailing APi
+    $this->add(
+      'select',
+      'mailing_xcm_profile',
+      E::ts('Mailing XCM Profile'),
+      CRM_Xcm_Configuration::getProfileList(),
+      TRUE
+    );
+
+    $this->add(
+      'text',
+      'mailing_subscription_endpoint',
+      E::ts('Mailing Subscription Endpoint'),
+      array("class" => "huge"),
+      FALSE
+    );
 
 
     /** Configuration for Donation API (discontinued)

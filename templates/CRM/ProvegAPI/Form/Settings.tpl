@@ -29,6 +29,21 @@
   <div class="clear"></div>
 </div>
 
+
+<br/><h3>{ts domain='com.proveg.api'}Mailing Config{/ts}</h3><br/>
+
+<div class="crm-section">
+  <div class="label">{$form.mailing_subscription_endpoint.label}</div>
+  <div class="content">{$form.mailing_subscription_endpoint.html}</div>
+  <div class="clear"></div>
+</div>
+
+<div class="crm-section">
+  <div class="label">{$form.mailing_xcm_profile.label}</div>
+  <div class="content">{$form.mailing_xcm_profile.html}</div>
+  <div class="clear"></div>
+</div>
+
 {* FOOTER *}
 <div class="crm-submit-buttons">
 {include file="CRM/common/formButtons.tpl" location="bottom"}
