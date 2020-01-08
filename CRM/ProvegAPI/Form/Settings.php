@@ -53,8 +53,16 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
 
     $this->add(
       'text',
-      'mailing_subscription_endpoint',
-      E::ts('Mailing Subscription Endpoint'),
+      'mailing_confirmation_endpoint',
+      E::ts('Mailing Confirmation Endpoint'),
+      array("class" => "huge"),
+      FALSE
+    );
+
+    $this->add(
+      'text',
+      'mailing_unsubscription_endpoint',
+      E::ts('Mailing Unsubscription Endpoint'),
       array("class" => "huge"),
       FALSE
     );

@@ -13,7 +13,7 @@ function _civicrm_api3_proveg_mailing_Subscribe_spec(&$spec) {
   $spec['email']['api.required'] = 1;
   $spec['first_name']['api.required'] = 0;
   $spec['last_name']['api.required'] = 0;
-  $spec['prefix_id']['api.required'] = 1;
+  $spec['prefix_id']['api.required'] = 0;
 }
 
 /**

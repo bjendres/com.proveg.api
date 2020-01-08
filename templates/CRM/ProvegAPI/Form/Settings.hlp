@@ -1,0 +1,27 @@
+{*-------------------------------------------------------+
+| SYSTOPIA MailingTools Extension                        |
+| Copyright (C) 2020 SYSTOPIA                            |
+| Author: P. Batroff (batroff@systopia.de)               |
++--------------------------------------------------------+
+| This program is released as free software under the    |
+| Affero GPL license. You can redistribute it and/or     |
+| modify it under the terms of this license which you    |
+| can read by viewing the included agpl.txt or online    |
+| at www.gnu.org/licenses/agpl.html. Removal of this     |
+| copyright header is strictly prohibited without        |
+| written permission from the original author(s).        |
++-------------------------------------------------------*}
+
+
+{htxt id="id-provegapi-confirmation-endpoint"}
+  <p>{ts domain="com.proveg.api"}This is the URL of the script handling the email confirmation for the double opt-in signup process. This will replace the base URL of CiviCRM in the confirmation Email.{/ts}</p>
+{/htxt}
+
+{htxt id="id-provegapi-unsubscribe-endpoint"}
+  <p>{ts domain="com.proveg.api"}This is the URL of the script handling the unsubscribe process.{/ts}</p>
+{/htxt}
+
+{htxt id="id-provegapi-xcm-profile"}
+  <p>{ts domain="com.proveg.api"}Please chose the configured XCM Profile for looking up/matching contacts coming from the subscription Page.{/ts}</p>
+{/htxt}
+
