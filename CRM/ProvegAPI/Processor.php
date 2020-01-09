@@ -68,18 +68,6 @@ class CRM_ProvegAPI_Processor {
   }
 
   /**
-   * Get the contact ID by hash
-   *
-   * @param string $hash  have value
-   * @return integer contact ID
-   * @throws Exception if not found
-   */
-  public static function getContactIDbyHash($hash) {
-    return (int) civicrm_api3('Contact', 'getvalue', ['hash' => $hash, 'return' => 'id']);
-  }
-
-
-  /**
    * Get the bulk email address for the contact
    *
    * @param $contact_id
