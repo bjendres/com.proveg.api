@@ -53,10 +53,10 @@ function civicrm_api3_proveg_selfservice_contactdata($params)
       }
 
       // update interests
-      if (!empty($params['custom_146'])) {
+      if (!empty($params['custom_144'])) {
         civicrm_api3('Contact', 'create', [
             'id'         => $params['id'],
-            'custom_146' => $params['custom_146']
+            'custom_144' => $params['custom_144']
         ]);
       }
 
