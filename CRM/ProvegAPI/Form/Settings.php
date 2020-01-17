@@ -153,7 +153,11 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
 
   public function postProcess() {
     $values = $this->exportValues(null, true);
-    CRM_Core_BAO_Setting::setItem($values, 'com.proveg.api', 'pvapi_config');
+    $settings_in_form = $this->getSettingsInForm();
+    foreach ($settings_in_form as $name) {
+      $settings[$name] = CRM_Utils_Array::value($name, $values, NULL);
+    }
+    CRM_Core_BAO_Setting::setItem($settings, 'com.proveg.api', 'pvapi_config');
     parent::postProcess();
   }
 
@@ -197,5 +201,21 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
       $list[$entry[$id_field]] = $entry[$label_field];
     }
     return $list;
+  }
+
+  /**
+   * get the elements of the form
+   * used as a filter for the values array from post Process
+   * @return array
+   */
+  protected function getSettingsInForm() {
+    return array(
+      'log_api_calls',
+      'selfservice_xcm_profile',
+      'mailing_xcm_profile',
+      'mailing_confirmation_endpoint',
+      'mailing_unsubscription_endpoint',
+      'mailing_default_group_id',
+    );
   }
 }
