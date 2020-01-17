@@ -67,6 +67,14 @@ class CRM_ProvegAPI_Form_Settings extends CRM_Core_Form {
       FALSE
     );
 
+    $this->add(
+      'text',
+      'mailing_default_group_id',
+      E::ts('Mailing default group'),
+      array("class" => "huge"),
+      FALSE
+    );
+
 
     /** Configuration for Donation API (discontinued)
     // add form elements

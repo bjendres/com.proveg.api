@@ -15,10 +15,16 @@
 
 {htxt id="id-provegapi-confirmation-endpoint"}
   <p>{ts domain="com.proveg.api"}This is the URL of the script handling the email confirmation for the double opt-in signup process. This will replace the base URL of CiviCRM in the confirmation Email.{/ts}</p>
+  <p>{ts domain="com.proveg.api"}URL needs to be without trailing '/'{/ts}</p>
 {/htxt}
 
 {htxt id="id-provegapi-unsubscribe-endpoint"}
   <p>{ts domain="com.proveg.api"}This is the URL of the script handling the unsubscribe process.{/ts}</p>
+  <p>{ts domain="com.proveg.api"}URL needs to be without trailing '/'{/ts}</p>
+{/htxt}
+
+{htxt id="id-provegapi-default-group"}
+  <p>{ts domain="com.proveg.api"}The default group if no groupd id is given on API call{/ts}</p>
 {/htxt}
 
 {htxt id="id-provegapi-xcm-profile"}

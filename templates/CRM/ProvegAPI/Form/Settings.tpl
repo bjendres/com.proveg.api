@@ -45,6 +45,12 @@
 </div>
 
 <div class="crm-section">
+  <div class="label">{$form.mailing_default_group_id.label} <a onclick='CRM.help("{ts domain='com.proveg.api'}Default Group{/ts}", {literal}{"id":"id-provegapi-default-group","file":"CRM\/ProvegAPI\/Form\/Settings"}{/literal}); return false;' href="#" title="{ts domain='com.proveg.api'}Help{/ts}" class="helpicon">&nbsp;</a></div>
+  <div class="content">{$form.mailing_default_group_id.html}</div>
+  <div class="clear"></div>
+</div>
+
+<div class="crm-section">
   <div class="label">{$form.mailing_xcm_profile.label} <a onclick='CRM.help("{ts domain='com.proveg.api'}Confirmation Endpoint{/ts}", {literal}{"id":"id-provegapi-xcm-profile","file":"CRM\/ProvegAPI\/Form\/Settings"}{/literal}); return false;' href="#" title="{ts domain='com.proveg.api'}Help{/ts}" class="helpicon">&nbsp;</a></div>
   <div class="content">{$form.mailing_xcm_profile.html}</div>
   <div class="clear"></div>
