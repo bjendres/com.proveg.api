@@ -45,7 +45,7 @@
    */
   private function parse_confirmation_endpoint(&$content) {
     $pattern = "/https:\/\/(?P<url>[a-zA-Z0-9\/_.-]+)\/civicrm\/mailing\/confirm/";
-    preg_replace($pattern, $this::$confirm_url, $content);
+    $content = preg_replace($pattern, $this::$confirm_url, $content);
   }
 
   /**
@@ -54,7 +54,7 @@
    */
   private function parse_unsubscription_endpoint(&$content) {
     $pattern = "/https:\/\/(?P<url>[a-zA-Z0-9\/_.-]+)\/civicrm\/mailing\/unsubscribe/";
-    preg_replace($pattern, $this::$confirm_url, $content);
+    $content = preg_replace($pattern, $this::$unsubscribe_url, $content);
   }
 
 }
