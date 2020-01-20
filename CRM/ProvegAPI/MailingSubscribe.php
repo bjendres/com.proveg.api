@@ -16,52 +16,84 @@
 
 class CRM_ProvegAPI_MailingSubscribe {
 
-  private $first_name = NULL;
-  private $last_name = NULL;
-  private $email = NULL;
-  private $prefix_id = NULL;
   private $group_id = NULL;
+  private $xcm_params = [];
+  private $contact_id = NULL;
 
+  /**
+   * CRM_ProvegAPI_MailingSubscribe constructor.
+   */
   public function __construct() {
   }
 
+  /**
+   * @param $parameters
+   *
+   * @throws \API_Exception
+   */
   public function handle_request($parameters) {
     $this->handle_parameters($parameters);
-    $contact_id = $this->get_contact();
+    $this->contact_id = $this->get_or_create_contact();
+    $this->mailing_event_subscribe();
   }
 
+  /**
+   * @throws \API_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function mailing_event_subscribe() {
+    $params = [
+      'email' => $this->xcm_params['email'],
+      'contact_id' => $this->contact_id,
+      'group_id' => $this->xcm_params['group_id'],
+    ];
+
+    $result = civicrm_api3('MailingEventSubscribe', 'create', $params);
+    if ($result['is_error'] != '0') {
+      throw new API_Exception("Error Subscribing Contact {$this->contact_id} with Email {$this->email} to group {$this->group_id}. Error Message: {$result['error_message']}");
+    }
+  }
+
+  /**
+   * @return null
+   */
+  public function get_contact_id() {
+    return $this->contact_id;
+  }
+
+  /**
+   * @param $parameters
+   */
   private function handle_parameters($parameters) {
     if (isset($parameters['first_name'])) {
-      $this->first_name = $parameters['first_name'];
+      $this->xcm_params['first_name'] = $parameters['first_name'];
     }
     if (isset($parameters['last_name'])) {
-      $this->last_name = $parameters['last_name'];
+      $this->xcm_params['last_name'] = $parameters['last_name'];
     }
     if (isset($parameters['email'])) {
-      $this->email = $parameters['email'];
+      $this->xcm_params['email'] = $parameters['email'];
     }
     if (isset($parameters['prefix_id'])) {
-      $this->prefix_id = $parameters['prefix_id'];
+      $this->xcm_params['prefix_id'] = $parameters['prefix_id'];
     }
     if (isset($parameters['group_id'])) {
+      $this->xcm_params['group_id'] = $parameters['group_id'];
       $this->group_id = $parameters['group_id'];
     } else {
       // get from Config
-      $this->group_id = CRM_ProvegAPI_Configuration::getSetting('mailing_default_group_id');
+      $this->xcm_params['group_id'] = CRM_ProvegAPI_Configuration::getSetting('mailing_default_group_id');
     }
   }
 
-  private function get_contact() {
-    $xcm_profile = CRM_ProvegAPI_Configuration:;getSetting('mailing_xcm_profile');
-    $contact_type = 'Individual';
-    $result = civicrm_api3('Contact', 'getorcreate', [
-      'contact_type' => $contact_type,
-      'xcm_profile' => $xcm_profile,
-      'prefix_id' => $this->prefix_id,
-      'first_name' => $this->first_name,
-      'last_name' => $this->last_name,
-      'email' => $this->email,
-    ]);
+  /**
+   * @return mixed
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function get_or_create_contact() {
+    $this->xcm_params['contact_type'] = 'Individual';
+    $this->xcm_params['xcm_profile'] = CRM_ProvegAPI_Configuration::getSetting('mailing_xcm_profile');
+    $result = civicrm_api3('Contact', 'getorcreate', $this->xcm_params);
     return $result['id'];
   }
 
