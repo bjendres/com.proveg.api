@@ -170,7 +170,7 @@ function provegapi_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
  * so we can manipulate the content of outgoing emails
  */
 function provegapi_civicrm_alterMailer(&$mailer, $driver, $params) {
-  $mailer = new CRM_Mailingtools_Mailer($mailer);
+  $mailer = new CRM_ProvegAPI_Mailer($mailer);
 }
 
 // --- Functions below this ship commented out. Uncomment as required. ---
