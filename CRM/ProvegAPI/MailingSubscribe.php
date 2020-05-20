@@ -19,6 +19,7 @@ class CRM_ProvegAPI_MailingSubscribe {
   private $group_id = NULL;
   private $xcm_params = [];
   private $contact_id = NULL;
+  private $hash = NULL;
 
   /**
    * CRM_ProvegAPI_MailingSubscribe constructor.
@@ -52,6 +53,7 @@ class CRM_ProvegAPI_MailingSubscribe {
     if ($result['is_error'] != '0') {
       throw new API_Exception("Error Subscribing Contact {$this->contact_id} with Email {$this->email} to group {$this->group_id}. Error Message: {$result['error_message']}");
     }
+    $this->hash = $result['values'][$result['id']]['hash'];
   }
 
   /**
@@ -60,6 +62,19 @@ class CRM_ProvegAPI_MailingSubscribe {
   public function get_contact_id() {
     return $this->contact_id;
   }
+
+  /**
+   * @return array
+   */
+  public function get_log_parameters() {
+    return [
+      'contact_id' => $this->contact_id,
+      'group_id' => $this->group_id,
+      'hash' => $this->hash,
+      'email' => $this->xcm_params['email'],
+    ];
+  }
+
 
   /**
    * @param $parameters
