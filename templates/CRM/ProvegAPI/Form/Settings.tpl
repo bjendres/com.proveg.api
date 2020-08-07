@@ -29,6 +29,33 @@
   <div class="clear"></div>
 </div>
 
+
+<br/><h3>{ts domain='com.proveg.api'}Mailing Config{/ts}</h3><br/>
+
+<div class="crm-section">
+  <div class="label">{$form.mailing_confirmation_endpoint.label} <a onclick='CRM.help("{ts domain='com.proveg.api'}Confirmation Endpoint{/ts}", {literal}{"id":"id-provegapi-confirmation-endpoint","file":"CRM\/ProvegAPI\/Form\/Settings"}{/literal}); return false;' href="#" title="{ts domain='com.proveg.api'}Help{/ts}" class="helpicon">&nbsp;</a></div>
+  <div class="content">{$form.mailing_confirmation_endpoint.html}</div>
+  <div class="clear"></div>
+</div>
+
+<div class="crm-section">
+  <div class="label">{$form.mailing_unsubscription_endpoint.label} <a onclick='CRM.help("{ts domain='com.proveg.api'}Confirmation Endpoint{/ts}", {literal}{"id":"id-provegapi-unsubscribe-endpoint","file":"CRM\/ProvegAPI\/Form\/Settings"}{/literal}); return false;' href="#" title="{ts domain='com.proveg.api'}Help{/ts}" class="helpicon">&nbsp;</a></div>
+  <div class="content">{$form.mailing_unsubscription_endpoint.html}</div>
+  <div class="clear"></div>
+</div>
+
+<div class="crm-section">
+  <div class="label">{$form.mailing_default_group_id.label} <a onclick='CRM.help("{ts domain='com.proveg.api'}Default Group{/ts}", {literal}{"id":"id-provegapi-default-group","file":"CRM\/ProvegAPI\/Form\/Settings"}{/literal}); return false;' href="#" title="{ts domain='com.proveg.api'}Help{/ts}" class="helpicon">&nbsp;</a></div>
+  <div class="content">{$form.mailing_default_group_id.html}</div>
+  <div class="clear"></div>
+</div>
+
+<div class="crm-section">
+  <div class="label">{$form.mailing_xcm_profile.label} <a onclick='CRM.help("{ts domain='com.proveg.api'}Confirmation Endpoint{/ts}", {literal}{"id":"id-provegapi-xcm-profile","file":"CRM\/ProvegAPI\/Form\/Settings"}{/literal}); return false;' href="#" title="{ts domain='com.proveg.api'}Help{/ts}" class="helpicon">&nbsp;</a></div>
+  <div class="content">{$form.mailing_xcm_profile.html}</div>
+  <div class="clear"></div>
+</div>
+
 {* FOOTER *}
 <div class="crm-submit-buttons">
 {include file="CRM/common/formButtons.tpl" location="bottom"}
