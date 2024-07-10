@@ -28,7 +28,7 @@ class CRM_ProvegAPI_Submission {
    * @return int | NULL
    *   The ID of the matching/created contact, or NULL if no matching contact
    *   was found and no new contact could be created.
-   * @throws \CiviCRM_API3_Exception | API_Exception
+   * @throws \CiviCRM_API3_Exception | CRM_Core_Exception
    *   When invalid data was given.
    *
    * @deprecated ProvegDonation.submit was discontinued
@@ -56,7 +56,7 @@ class CRM_ProvegAPI_Submission {
           unset($contact_data['country']);
         }
         else {
-          throw new API_Exception("Unknown country '{$contact_data['country']}'", 1);
+          throw new CRM_Core_Exception("Unknown country '{$contact_data['country']}'", 1);
         }
       }
     }
