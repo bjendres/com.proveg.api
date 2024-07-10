@@ -94,7 +94,7 @@ class CRM_ProvegAPI_Submission {
             'is_active'           => 1
         ]);
         if (empty($campaign_query['id'])) {
-          CRM_Core_Error::debug_log_message("PVAPI: Campaign code '{$campaign_code}' not (uniquely) identified!");
+          Civi::log()->debug("PVAPI: Campaign code '{$campaign_code}' not (uniquely) identified!");
         } else {
           $campaign_id = (int) $campaign_query['id'];
         }

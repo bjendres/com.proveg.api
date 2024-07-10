@@ -29,7 +29,7 @@
 function civicrm_api3_proveg_newsletter_subscription_submit($params) {
   // Log the API call to the CiviCRM debug log.
   if (defined('PROVEG_API_LOGGING') && PROVEG_API_LOGGING) {
-    CRM_Core_Error::debug_log_message('ProvegNewsletterSubscription.submit: ' . json_encode($params));
+    Civi::log()->debug('ProvegNewsletterSubscription.submit: ' . json_encode($params));
   }
 
   try {
@@ -70,7 +70,7 @@ function civicrm_api3_proveg_newsletter_subscription_submit($params) {
   }
    catch (CiviCRM_API3_Exception $exception) {
      if (defined('PROVEG_API_LOGGING') && PROVEG_API_LOGGING) {
-       CRM_Core_Error::debug_log_message('ProvegNewsletterSubscription:submit:Exception caught: ' . $exception->getMessage());
+       Civi::log()->debug('ProvegNewsletterSubscription:submit:Exception caught: ' . $exception->getMessage());
      }
 
      $extraParams = $exception->getExtraParams();

@@ -29,7 +29,7 @@
 function civicrm_api3_proveg_donation_submit($params) {
   // Log the API call to the CiviCRM debug log.
   if (defined('PROVEG_API_LOGGING') && PROVEG_API_LOGGING) {
-    CRM_Core_Error::debug_log_message('ProvegDonation.submit: ' . json_encode($params));
+    Civi::log()->debug('ProvegDonation.submit: ' . json_encode($params));
   }
 
   // extract campaign_id (see PV-8280)
@@ -226,7 +226,7 @@ function civicrm_api3_proveg_donation_submit($params) {
 
       // create membership
       CRM_ProvegAPI_CustomData::resolveCustomFields($membership_data);
-      CRM_Core_Error::debug_log_message("Membership create: " . json_encode($membership_data));
+      Civi::log()->debug("Membership create: " . json_encode($membership_data));
       $membership = civicrm_api3('Membership', 'create', $membership_data);
 
       // reload to get all data
@@ -239,7 +239,7 @@ function civicrm_api3_proveg_donation_submit($params) {
             'contact_id'                              => $membership['contact_id'],
             'membership_info.membership_paid_through' => $recurring_contribution_id];
         CRM_ProvegAPI_CustomData::resolveCustomFields($membership_update);
-        CRM_Core_Error::debug_log_message("Membership update: " . json_encode($membership_update));
+        Civi::log()->debug("Membership update: " . json_encode($membership_update));
         civicrm_api3('Membership', 'create', $membership_update);
       }
 
@@ -262,7 +262,7 @@ function civicrm_api3_proveg_donation_submit($params) {
   }
   catch (CiviCRM_API3_Exception $exception) {
     if (defined('PROVEG_API_LOGGING') && PROVEG_API_LOGGING) {
-      CRM_Core_Error::debug_log_message('ProvegDonation:submit:Exception caught: ' . $exception->getMessage());
+      Civi::log()->debug('ProvegDonation:submit:Exception caught: ' . $exception->getMessage());
     }
 
     $extraParams = $exception->getExtraParams();
