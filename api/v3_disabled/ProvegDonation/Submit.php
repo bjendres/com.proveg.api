@@ -41,7 +41,7 @@ function civicrm_api3_proveg_donation_submit($params) {
 
   try {
     if ($params['frequency'] && $params['payment_instrument_id'] != 'sepa') {
-      throw new CiviCRM_API3_Exception(
+      throw new CRM_Core_Exception(
         'Recurring donations can only be submitted with SEPA.',
         'invalid_format'
       );
@@ -75,13 +75,13 @@ function civicrm_api3_proveg_donation_submit($params) {
           $contact_data['gender_id'] = array_search('Female', $genders);
           break;
         default:
-          throw new CiviCRM_API3_Exception('Could not determine option value from given gender.', 0);
+          throw new CRM_Core_Exception('Could not determine option value from given gender.', 0);
           break;
       }
     }
 
     if (!$contact_id = CRM_ProvegAPI_Submission::getContact('Individual', $contact_data)) {
-      throw new CiviCRM_API3_Exception(
+      throw new CRM_Core_Exception(
         'Individual contact could not be found or created.',
         'invalid_format'
       );
@@ -112,26 +112,26 @@ function civicrm_api3_proveg_donation_submit($params) {
       case 'sepa':
         // Require IBAN.
         if (empty($params['iban'])) {
-          throw new CiviCRM_API3_Exception(
+          throw new CRM_Core_Exception(
             'For donations via SEPA, the IBAN must be provided.',
             'invalid_format'
           );
         }
         elseif ($error = CRM_Sepa_Logic_Verification::verifyIBAN($params['iban'])) {
-          throw new CiviCRM_API3_Exception(
+          throw new CRM_Core_Exception(
             $error,
             'invalid_format'
           );
         }
         // Require BIC.
         if (empty($params['bic'])) {
-          throw new CiviCRM_API3_Exception(
+          throw new CRM_Core_Exception(
             'For donations via SEPA, the SWIFT code (BIC) must be provided.',
             'invalid_format'
           );
         }
         elseif ($error = CRM_Sepa_Logic_Verification::verifyBIC($params['bic'])) {
-          throw new CiviCRM_API3_Exception(
+          throw new CRM_Core_Exception(
             $error,
             'invalid_format'
           );
@@ -168,7 +168,7 @@ function civicrm_api3_proveg_donation_submit($params) {
               'id' => $sepa_mandate['entity_id']));
           }
           if (!isset($contribution)) {
-            throw new CiviCRM_API3_Exception(
+            throw new CRM_Core_Exception(
               'Could not load contribution for SEPA mandate.',
               'invalid_format'
             );
@@ -190,7 +190,7 @@ function civicrm_api3_proveg_donation_submit($params) {
 
       // Invalid payment method.
       default:
-        throw new CiviCRM_API3_Exception(
+        throw new CRM_Core_Exception(
           'Invalid payment instrument.',
           'invalid_format'
         );
@@ -260,7 +260,7 @@ function civicrm_api3_proveg_donation_submit($params) {
 
     return civicrm_api3_create_success($contribution, $params, NULL, NULL, $dao = NULL, array('extra' => $extra_return_values));
   }
-  catch (CiviCRM_API3_Exception $exception) {
+  catch (CRM_Core_Exception $exception) {
     if (defined('PROVEG_API_LOGGING') && PROVEG_API_LOGGING) {
       Civi::log()->debug('ProvegDonation:submit:Exception caught: ' . $exception->getMessage());
     }
@@ -297,7 +297,7 @@ function civicrm_api3_proveg_donation_submit($params) {
         $extraParams['additional_notices']['activity']['messages'][] = 'No contact ID is configured for assigning an activity of the type "Failed contribution processing". The activity has not been assigned to a contact.';
       }
     }
-    catch (CiviCRM_API3_Exception $activity_exception) {
+    catch (CRM_Core_Exception $activity_exception) {
       $extraParams['additional_notices']['activity']['messages'][] = 'Failed creating an activity of the type "Failed contribution processing".';
       $extraParams['additional_notices']['activity']['result'] = civicrm_api3_create_error($activity_exception->getMessage(), $activity_exception->getExtraParams());
     }

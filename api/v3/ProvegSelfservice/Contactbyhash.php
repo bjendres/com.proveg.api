@@ -44,7 +44,7 @@ function civicrm_api3_proveg_selfservice_contactbyhash($params) {
       $data['email'] = CRM_ProvegAPI_Processor::getBulkmail($data['id']);
 
       return $data;
-    } catch (CiviCRM_API3_Exception $ex) {
+    } catch (CRM_Core_Exception $ex) {
       // not found
       return civicrm_api3_create_error("Not found");
     }

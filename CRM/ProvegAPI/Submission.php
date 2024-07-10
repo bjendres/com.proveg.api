@@ -28,7 +28,7 @@ class CRM_ProvegAPI_Submission {
    * @return int | NULL
    *   The ID of the matching/created contact, or NULL if no matching contact
    *   was found and no new contact could be created.
-   * @throws \CiviCRM_API3_Exception | CRM_Core_Exception
+   * @throws \CRM_Core_Exception | CRM_Core_Exception
    *   When invalid data was given.
    *
    * @deprecated ProvegDonation.submit was discontinued
@@ -131,7 +131,7 @@ class CRM_ProvegAPI_Submission {
    * @return boolean
    *   Whether the organisation address has been shared with the contact.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function shareWorkAddress($contact_id, $organisation_id, $location_type_id = NULL) {
     if ($location_type_id === NULL) {
