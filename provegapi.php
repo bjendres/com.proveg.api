@@ -38,7 +38,6 @@ function provegapi_civicrm_alterAPIPermissions($entity, $action, &$params, &$per
   $permissions['proveg_selfservice']['contactdata']   = ['access ProVeg API'];
 }
 
-
 /**
  * Implements hook_civicrm_config().
  *
@@ -49,39 +48,12 @@ function provegapi_civicrm_config(&$config) {
 }
 
 /**
- * Implements hook_civicrm_xmlMenu().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_xmlMenu
- */
-function provegapi_civicrm_xmlMenu(&$files) {
-  _provegapi_civix_civicrm_xmlMenu($files);
-}
-
-/**
  * Implements hook_civicrm_install().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_install
  */
 function provegapi_civicrm_install() {
   _provegapi_civix_civicrm_install();
-}
-
-/**
- * Implements hook_civicrm_postInstall().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_postInstall
- */
-function provegapi_civicrm_postInstall() {
-  _provegapi_civix_civicrm_postInstall();
-}
-
-/**
- * Implements hook_civicrm_uninstall().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_uninstall
- */
-function provegapi_civicrm_uninstall() {
-  _provegapi_civix_civicrm_uninstall();
 }
 
 /**
@@ -180,9 +152,8 @@ function provegapi_civicrm_alterMailer(&$mailer, $driver, $params) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_preProcess
  *
-function provegapi_civicrm_preProcess($formName, &$form) {
 
-} // */
+ // */
 
 /**
  * Implements hook_civicrm_navigationMenu().

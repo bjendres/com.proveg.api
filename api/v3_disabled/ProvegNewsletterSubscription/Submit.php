@@ -24,12 +24,12 @@
  *
  * @access public
  *
- * @throws \API_Exception
+ * @throws \CRM_Core_Exception
  */
 function civicrm_api3_proveg_newsletter_subscription_submit($params) {
   // Log the API call to the CiviCRM debug log.
   if (defined('PROVEG_API_LOGGING') && PROVEG_API_LOGGING) {
-    CRM_Core_Error::debug_log_message('ProvegNewsletterSubscription.submit: ' . json_encode($params));
+    Civi::log()->debug('ProvegNewsletterSubscription.submit: ' . json_encode($params));
   }
 
   try {
@@ -37,7 +37,7 @@ function civicrm_api3_proveg_newsletter_subscription_submit($params) {
       $contact_id = $params['contact_id'];
     }
     elseif (empty($params['email'])) {
-      throw new CiviCRM_API3_Exception(
+      throw new CRM_Core_Exception(
         'Mandatory key(s) missing from params array: email',
         'mandatory_missing',
         array(
@@ -54,7 +54,7 @@ function civicrm_api3_proveg_newsletter_subscription_submit($params) {
         'email' => $params['email'],
       );
       if (!$contact_id = CRM_ProvegAPI_Submission::getContact('Individual', $contact_data)) {
-        throw new CiviCRM_API3_Exception('Individual contact could not be found or created.', 'invalid_format');
+        throw new CRM_Core_Exception('Individual contact could not be found or created.', 'invalid_format');
       }
     }
 
@@ -68,9 +68,9 @@ function civicrm_api3_proveg_newsletter_subscription_submit($params) {
     return civicrm_api3_create_success($groupcontact, $params, NULL, NULL, $dao = NULL, array());
 
   }
-   catch (CiviCRM_API3_Exception $exception) {
+   catch (CRM_Core_Exception $exception) {
      if (defined('PROVEG_API_LOGGING') && PROVEG_API_LOGGING) {
-       CRM_Core_Error::debug_log_message('ProvegNewsletterSubscription:submit:Exception caught: ' . $exception->getMessage());
+       Civi::log()->debug('ProvegNewsletterSubscription:submit:Exception caught: ' . $exception->getMessage());
      }
 
      $extraParams = $exception->getExtraParams();

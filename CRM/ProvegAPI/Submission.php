@@ -28,7 +28,7 @@ class CRM_ProvegAPI_Submission {
    * @return int | NULL
    *   The ID of the matching/created contact, or NULL if no matching contact
    *   was found and no new contact could be created.
-   * @throws \CiviCRM_API3_Exception | API_Exception
+   * @throws \CRM_Core_Exception | CRM_Core_Exception
    *   When invalid data was given.
    *
    * @deprecated ProvegDonation.submit was discontinued
@@ -56,7 +56,7 @@ class CRM_ProvegAPI_Submission {
           unset($contact_data['country']);
         }
         else {
-          throw new API_Exception("Unknown country '{$contact_data['country']}'", 1);
+          throw new CRM_Core_Exception("Unknown country '{$contact_data['country']}'", 1);
         }
       }
     }
@@ -94,7 +94,7 @@ class CRM_ProvegAPI_Submission {
             'is_active'           => 1
         ]);
         if (empty($campaign_query['id'])) {
-          CRM_Core_Error::debug_log_message("PVAPI: Campaign code '{$campaign_code}' not (uniquely) identified!");
+          Civi::log()->debug("PVAPI: Campaign code '{$campaign_code}' not (uniquely) identified!");
         } else {
           $campaign_id = (int) $campaign_query['id'];
         }
@@ -131,7 +131,7 @@ class CRM_ProvegAPI_Submission {
    * @return boolean
    *   Whether the organisation address has been shared with the contact.
    *
-   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function shareWorkAddress($contact_id, $organisation_id, $location_type_id = NULL) {
     if ($location_type_id === NULL) {
