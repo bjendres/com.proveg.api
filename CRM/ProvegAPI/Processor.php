@@ -199,9 +199,12 @@ class CRM_ProvegAPI_Processor {
       $valid_user = FALSE;
 
       // Check and see if a valid secret API key is provided.
-      $api_key = CRM_Utils_Request::retrieve('api_key', 'String', $store, FALSE, NULL, 'REQUEST');
+      $api_key = CRM_Utils_Request::retrieve('api_key', 'String', NULL, FALSE, NULL, 'REQUEST');
       if (!$api_key || strtolower($api_key) == 'null') {
-        $session->set('userID', CRM_ProvegAPI_Configuration::getFallbackUserID());
+          // fallback user needs configuration, and might probably be a security risk. Logging error for now
+          // initial function not implemented
+          Civi::log()->debug("[com.proveg.api] No API key provided for Uswr {$$userId}");
+//        $session->set('userID', CRM_ProvegAPI_Configuration::getFallbackUserID());
       }
 
       $valid_user = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
